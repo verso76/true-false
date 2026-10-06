@@ -1,0 +1,1521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>True / False</title>
+<meta name="description" content="A daily deck of incredible true stories, popular myths and convincing fakes. Swipe: true or false?">
+<meta name="theme-color" content="#1e1c19">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="True/False">
+<meta name="robots" content="noindex">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  html { background: #1e1c19; -webkit-text-size-adjust: 100%; }
+  .app { padding-top: max(10px, env(safe-area-inset-top)) !important; padding-bottom: max(14px, env(safe-area-inset-bottom)) !important; }
+  body { -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+  /* Layout: one-screen phone app — top bar, a paper story card that swipes and flips, an action bar. Single dark look by design. */
+  :root {
+    --ground: #1e1c19;
+    --ground-2: #2a2723;
+    --fg: #efe9dd;
+    --muted: #9b9285;
+    --paper: #d6cfbf;
+    --ink: #2b2723;
+    --ink-soft: #5a5348;
+    --band: #574e42;
+    --box: #2a2724;
+    --gold: #e2b545;
+    --true: #4d7d43;
+    --myth: #a8352c;
+    --fake: #5a3f8f;
+    --display: 'Oswald', 'Arial Narrow', 'Helvetica Neue', sans-serif;
+    --body: 'Roboto Condensed', 'Arial Narrow', 'Helvetica Neue', sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--ground); color: var(--fg);
+    font-family: var(--body); -webkit-tap-highlight-color: transparent;
+    overflow: hidden; overscroll-behavior: none;
+  }
+  .app {
+    height: 100%; max-width: 440px; margin: 0 auto;
+    display: grid; grid-template-rows: auto 1fr auto;
+    padding-inline: 16px; padding-block: 10px 14px; gap: 12px;
+  }
+
+  /* top bar */
+  .top { display: grid; gap: 10px; }
+  .top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .wordmark { font: 700 18px/1 var(--display); letter-spacing: .06em; text-transform: uppercase; }
+  .wordmark span { color: var(--gold); }
+  .score { display: flex; align-items: center; gap: 8px; background: var(--ground-2); border-radius: 999px; padding: 6px 14px 6px 10px; font: 600 17px/1 var(--display); font-variant-numeric: tabular-nums; }
+  .score svg { width: 18px; height: 18px; fill: var(--gold); }
+  .score.bump { animation: bump .5s ease; }
+  @keyframes bump { 40% { transform: scale(1.18); } }
+  .progress { display: flex; align-items: center; gap: 10px; }
+  .segs { flex: 1; display: flex; gap: 4px; }
+  .seg { flex: 1; height: 4px; border-radius: 2px; background: var(--ground-2); }
+  .seg.ok { background: var(--true); }
+  .seg.bad { background: var(--myth); }
+  .seg.now { background: var(--muted); }
+  .count { font: 500 13px/1 var(--display); color: var(--muted); letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+
+  /* card stage */
+  .stage { position: relative; min-height: 0; perspective: 1400px; }
+  .wrap { position: absolute; inset: 0; touch-action: none; transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .35s; }
+  .wrap.leaving { transform: translateX(-115%) rotate(-10deg); opacity: 0; }
+  .wrap.entering { transform: translateX(115%) rotate(10deg); opacity: 0; transition: none; }
+  .inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.3,.7,.2,1); }
+  .inner.flipped { transform: rotateY(180deg); }
+  .face {
+    position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(ellipse at center, rgba(255,255,255,0) 55%, rgba(80,60,30,.16) 100%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .3  0 0 0 0 .22  0 0 0 .2 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    box-shadow: 0 18px 40px rgba(0,0,0,.45);
+  }
+  .back { transform: rotateY(180deg); }
+
+  .head { display: flex; gap: 4px; padding: 12px 12px 0; flex: none; }
+  .num { width: 50px; background: var(--box); color: var(--fg); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; padding-block: 6px; }
+  .num small { font: 600 10px var(--display); color: var(--gold); letter-spacing: .1em; }
+  .num b { font: 700 24px var(--display); }
+  .title { flex: 1; min-width: 0; background: var(--band); color: #f5f1e8; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px 8px 14px; }
+  .title .flag { align-self: flex-start; margin-top: 2px; width: 30px; height: 20px; flex: none; border-radius: 2px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.35); }
+  .title .flag svg { display: block; width: 100%; height: 100%; }
+  .title .flag.world { margin-top: 0; width: 24px; height: 24px; border-radius: 50%; box-shadow: none; }
+  .title .tl { flex: 1; min-width: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .title h2 { margin: 0; font: 700 23px/1.05 var(--display); text-transform: uppercase; text-wrap: balance; }
+  .seal { width: 30px; height: 30px; flex: none; border-radius: 50%; border: 2px solid var(--gold); color: var(--gold); display: flex; align-items: center; justify-content: center; font: 700 17px/1 var(--display); }
+
+  .art { position: relative; flex: 1 1 auto; min-height: 150px; margin: 4px 12px 0; background: #000; }
+  .art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+  .badges { position: absolute; left: 0; right: 0; bottom: -38px; display: flex; justify-content: center; align-items: flex-start; gap: 12px; }
+  .shield { width: 84px; height: 72px; padding: 4px; background: var(--paper); clip-path: polygon(0 0, 100% 0, 100% 68%, 50% 100%, 0 68%); }
+  .shield div { height: 100%; background: var(--box); color: var(--fg); clip-path: polygon(0 0, 100% 0, 100% 68%, 50% 100%, 0 68%); display: flex; flex-direction: column; align-items: center; padding-top: 9px; }
+  .shield b { font: 700 24px/1 var(--display); font-variant-numeric: tabular-nums; }
+  .shield em { font: 600 9px/1 var(--display); font-style: normal; letter-spacing: .16em; color: var(--gold); margin-top: 3px; }
+  .square { width: 64px; height: 64px; padding: 4px; background: var(--paper); margin-top: 2px; }
+  .square div { height: 100%; background: var(--box); display: flex; align-items: center; justify-content: center; }
+  .square svg { width: 34px; height: 34px; }
+
+  .story { flex: none; padding: 50px 20px 18px; text-align: center; font-size: 17px; line-height: 1.38; }
+  .story p { margin: 0; }
+
+  /* swipe stamps on the front */
+  .vote-stamp { position: absolute; top: 22%; font: 700 30px/1 var(--display); letter-spacing: .08em; text-transform: uppercase; padding: 6px 14px 8px; border: 4px solid currentColor; border-radius: 6px; background: rgba(214,207,191,.88); opacity: 0; pointer-events: none; z-index: 2; }
+  .vote-stamp.yes { left: 18px; color: var(--true); transform: rotate(-12deg); }
+  .vote-stamp.no { right: 18px; color: var(--myth); transform: rotate(12deg); }
+
+  /* back */
+  .strip { position: relative; flex: none; height: 118px; margin: 4px 12px 0; background: #000; }
+  .strip img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(.6) brightness(.8); display: block; }
+  .verdict { position: absolute; left: 50%; bottom: -26px; transform: translateX(-50%) rotate(-5deg); font: 700 44px/1 var(--display); letter-spacing: .08em; text-transform: uppercase; padding: 6px 22px 9px; border: 5px solid currentColor; border-radius: 8px; background: rgba(214,207,191,.94); white-space: nowrap; }
+  .verdict.true { color: var(--true); }
+  .verdict.myth { color: var(--myth); }
+  .verdict.fake { color: var(--fake); }
+  .frame-q { font: 600 10px/1 var(--display); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
+  .reveal { flex: 1; min-height: 0; overflow-y: auto; padding: 44px 20px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .you { align-self: center; font: 600 14px/1.2 var(--display); letter-spacing: .04em; padding: 7px 12px; border-radius: 4px; color: #f5f1e8; text-align: center; }
+  .you.ok { background: var(--true); }
+  .you.bad { background: var(--myth); }
+  .label { font: 600 11px/1 var(--display); letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft); text-align: center; }
+  .answer { font-size: 16px; line-height: 1.42; display: grid; gap: 10px; }
+  .answer p { margin: 0; }
+  .source { margin: 4px 0 0; font-size: 12.5px; line-height: 1.35; font-style: italic; color: var(--ink-soft); text-align: center; }
+
+  /* end screen */
+  .end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 14px; padding: 24px; border-radius: 18px; background: var(--ground-2); }
+  .end h2 { margin: 0; font: 700 34px/1.05 var(--display); text-transform: uppercase; text-wrap: balance; }
+  .end .big { font: 700 72px/1 var(--display); color: var(--gold); font-variant-numeric: tabular-nums; }
+  .end p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.4; max-width: 30ch; }
+
+  /* start screen, deck of card backs */
+  .start { position: absolute; inset: 0; }
+  .deck { position: absolute; left: 0; right: 0; top: 0; bottom: 112px; }
+  .cb {
+    position: absolute; left: 50%; top: 50%; height: min(80%, 370px); aspect-ratio: 2 / 3; /* same proportions as back-munchausen.jpg, so nothing is cropped */
+    border-radius: 16px; padding: 0; overflow: hidden; transform: translate(-50%, -50%);
+    background: #3a332b;
+    box-shadow: 0 1px 0 rgba(0,0,0,.3), 0 10px 22px rgba(0,0,0,.32);
+  }
+  .cb-in { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .cb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+  .cb-seal { width: 30%; aspect-ratio: 1; border-radius: 50%; border: 3px solid var(--gold); color: var(--gold); display: flex; align-items: center; justify-content: center; font: 700 clamp(34px, 11vw, 56px)/1 var(--display); text-shadow: 0 2px 0 rgba(0,0,0,.35); }
+  .start-copy { position: absolute; left: 0; right: 0; bottom: 0; height: 104px; display: grid; align-content: center; gap: 6px; text-align: center; transition: opacity .25s; }
+  .start-copy h2 { margin: 0; font: 700 28px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; }
+  .start-copy p { margin: 0 auto; max-width: 32ch; color: var(--muted); font-size: 15px; line-height: 1.4; }
+  .btn:disabled { opacity: .55; cursor: default; }
+
+  .pills { display: flex; gap: 6px; align-items: center; }
+  .lang { appearance: none; border: 1px solid #4a443c; background: transparent; color: var(--fg); border-radius: 999px; height: 29px; min-width: 40px; padding: 0 10px; font: 600 13px/1 var(--display); letter-spacing: .1em; cursor: pointer; }
+  .lang:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .lang:disabled { opacity: .4; }
+  .lang.icon { min-width: 29px; width: 29px; padding: 0; display: flex; align-items: center; justify-content: center; }
+  .lang.icon svg { width: 15px; height: 15px; }
+  .sheet-bg { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; justify-content: center; }
+  .sheet { width: min(440px, 100%); background: var(--ground-2); color: var(--fg); border-radius: 16px 16px 0 0; padding: 18px 16px calc(16px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 10px; box-shadow: 0 -10px 30px rgba(0,0,0,.4); }
+  .sheet h3 { margin: 0 0 4px; font: 700 22px/1.1 var(--display); text-transform: uppercase; letter-spacing: .02em; }
+  .sheet .opt { appearance: none; border: 1px solid #4a443c; background: #34302a; color: var(--fg); border-radius: 10px; padding: 12px 14px; text-align: left; cursor: pointer; display: grid; gap: 3px; }
+  .sheet .opt b { font: 600 17px/1.1 var(--display); letter-spacing: .04em; text-transform: uppercase; }
+  .sheet .opt span { font-size: 14px; color: var(--muted); }
+  .sheet .opt.warn b { color: #e07a6f; }
+  .sheet .opt:focus-visible, .sheet .cancel:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .sheet .cancel { appearance: none; border: 0; background: transparent; color: var(--muted); font: 600 15px/1 var(--display); letter-spacing: .1em; text-transform: uppercase; padding: 12px; cursor: pointer; }
+  .wordmark { white-space: nowrap; }
+  .streak { display: flex; align-items: center; gap: 6px; background: var(--ground-2); border-radius: 999px; padding: 6px 12px 6px 9px; font: 600 17px/1 var(--display); font-variant-numeric: tabular-nums; }
+  .streak svg { width: 16px; height: 16px; fill: #e8833a; }
+  .streak b { font: 700 12px/1 var(--display); color: var(--ground); background: #e8833a; border-radius: 4px; padding: 3px 5px; letter-spacing: .04em; }
+  .hint { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 34px; }
+  .hint span { font-size: 13px; color: var(--muted); }
+  .bet { appearance: none; border: 2px solid var(--gold); background: transparent; color: var(--gold); border-radius: 999px; height: 34px; padding: 0 14px; font: 700 14px/1 var(--display); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; flex: none; transition: background .15s, color .15s; }
+  .bet[aria-pressed="true"] { background: var(--gold); color: var(--ground); }
+  .bet:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+  .wrap.bet-on .front { box-shadow: 0 0 0 3px var(--gold), 0 18px 40px rgba(0,0,0,.45); }
+  .bet-ribbon { position: absolute; right: 22px; top: 70px; z-index: 3; font: 700 12px/1 var(--display); letter-spacing: .12em; color: var(--ground); background: var(--gold); padding: 5px 9px; border-radius: 3px; transform: rotate(4deg); box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+  .you small { display: block; margin-top: 3px; font: 500 12px/1.2 var(--body); opacity: .9; }
+  .share { display: flex; gap: 4px; justify-content: center; }
+  .share i { width: 18px; height: 18px; border-radius: 3px; }
+  .share i.ok { background: var(--true); }
+  .share i.bad { background: var(--myth); }
+  .share i.bet { box-shadow: inset 0 0 0 2px var(--gold); }
+  .end .meta { color: var(--fg); font: 600 15px/1.3 var(--display); letter-spacing: .06em; text-transform: uppercase; }
+  .toast { position: fixed; left: 50%; bottom: 120px; transform: translateX(-50%); background: var(--fg); color: var(--ground); font: 600 14px/1 var(--display); padding: 10px 14px; border-radius: 6px; letter-spacing: .06em; }
+
+  /* action bar */
+  .actions { display: grid; gap: 8px; }
+  .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn { appearance: none; border: 0; border-radius: 8px; height: 56px; font: 700 19px/1 var(--display); letter-spacing: .1em; text-transform: uppercase; color: #f7f3ea; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .12s, filter .12s; }
+  .btn:active { transform: scale(.97); }
+  .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .btn.no { background: var(--myth); }
+  .btn.yes { background: var(--true); }
+  .btn.next { grid-column: 1 / -1; background: var(--fg); color: var(--ground); }
+  .btn svg { width: 18px; height: 18px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wrap, .inner, .btn { transition: none !important; }
+    .score.bump { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <div class="top-row">
+      <div class="wordmark" id="wordmark">True <span>/</span> false</div>
+      <div class="pills"><button class="lang icon" id="reset" type="button" aria-label="Start over"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg></button><button class="lang" id="lang" type="button" aria-label="Language">EN</button><div class="streak" id="streak" hidden aria-label="Серия"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c0-1.5-.6-2.5-1-3.5 3 1.5 5 4.5 5 7.5a7 7 0 0 1-14 0c0-6 7-8 7-13z"/></svg><span id="streakVal">0</span><b id="streakX" hidden>×2</b></div><div class="score" id="score" aria-label="Очки"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7.1L12 17.3 5.8 21l1.6-7.1L2 9.2l7.1-.6z"/></svg><span id="scoreVal">0</span></div></div>
+    </div>
+    <div class="progress"><div class="segs" id="segs"></div><div class="count" id="count"></div></div>
+  </header>
+
+  <main class="stage" id="stage"></main>
+
+  <footer class="actions">
+    <div class="hint" id="hint"></div>
+    <div class="btns" id="btns"></div>
+  </footer>
+</div>
+
+<script>
+const ICONS = {
+  science: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M24 6h16M27 6v18L12 52a5 5 0 0 0 4.5 7h31A5 5 0 0 0 52 52L37 24V6"/><path d="M18 42h28"/></svg>',
+  history: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M8 20L32 8l24 12z"/><path d="M8 20h48M10 56h44M6 60h52"/><path d="M15 26v24M26 26v24M38 26v24M49 26v24"/></svg>',
+  rulers: '<svg viewBox="0 0 64 64" fill="#efe9dd"><path d="M8 50 4 18l15 12L32 8l13 22 15-12-4 32Z"/><rect x="8" y="53" width="48" height="6" rx="1"/></svg>',
+  war: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4.5" stroke-linecap="round"><path d="M8 8l36 36M56 8L20 44"/><path d="M38 52l14-14M12 38l14 14"/><path d="M48 48l7 7M16 48l-7 7"/></svg>',
+  expedition: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4"><circle cx="32" cy="32" r="25"/><path d="M32 13l7 19h-14z" fill="#efe9dd" stroke="none"/><path d="M25 32h14l-7 19z" stroke-width="3" stroke-linejoin="round"/></svg>',
+  survival: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 34h13l6-15 9 30 7-21 4 6h17"/></svg>',
+  space: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M32 6c9 8 12 20 9 34H23C20 26 23 14 32 6z"/><circle cx="32" cy="24" r="4.5"/><path d="M23 33l-8 9v8l9-5M41 33l8 9v8l-9-5M27 46l5 12 5-12"/></svg>',
+  nature: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M12 52C10 28 26 12 54 10c0 28-16 44-40 42z"/><path d="M12 52L38 26"/></svg>',
+  culture: '<svg viewBox="0 0 64 64"><g transform="translate(32 33) scale(1.2) translate(-31 -26)"><g transform="translate(31 12) rotate(12 14 16)"><path d="M2 3 Q14 -1 26 3 L26 16 Q26 30 14 32 Q2 30 2 16 Z" fill="#efe9dd"/><path d="M6.5 13 q3.5 3 7 0 q-3.5 -1 -7 0Z M15 13 q3.5 3 7 0 q-3.5 -1 -7 0Z M8 26 q6 -6 12 0 q-6 -2.5 -12 0Z" fill="#2a2724"/></g><g transform="translate(5 8) rotate(-12 14 16)"><path d="M2 3 Q14 -1 26 3 L26 16 Q26 30 14 32 Q2 30 2 16 Z" fill="#efe9dd" stroke="#2a2724" stroke-width="3.5"/><path d="M6.5 12 q3.5 -3 7 0 q-3.5 1 -7 0Z M15 12 q3.5 -3 7 0 q-3.5 1 -7 0Z M7 19 q7 8 14 0 q-7 2.5 -14 0Z" fill="#2a2724"/></g></g></svg>',
+  music: '<svg viewBox="0 0 64 64" fill="#efe9dd"><path d="M24 10l30-6v38a8 8 0 1 1-4-7V16l-22 4.5V48a8 8 0 1 1-4-7z"/></svg>'
+};
+const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+const DECK = [
+  {
+    "art": "art-mendeleev.jpg",
+    "pos": "center 30%",
+    "cat": "science",
+    "pts": 2,
+    "isTrue": false,
+    "region": "ru",
+    "year": 1865,
+    "ru": {
+      "title": "Формула крепости",
+      "story": "В 1865 году Дмитрий Менделеев защитил докторскую диссертацию <b>«О соединении спирта с водой»</b>. В ней он вычислил идеальную крепость водки: <b>40 градусов</b>. С тех пор вся страна пьёт по формуле великого химика.",
+      "answer": [
+        "Диссертация была, но это работа по метрологии: как ведут себя смеси спирта с водой. Ни рецептов, ни действия на организм в ней нет.",
+        "40° придумали чиновники: округлили старый эталон «полугар» (около 38°), чтобы проще считать акциз. Норму закрепил Устав о питейных сборах <b>1886 года</b>."
+      ],
+      "source": "Википедия, «Водка»; И. С. Дмитриев, «Вопросы истории естествознания и техники», 1999, № 2"
+    },
+    "en": {
+      "title": "The Proof Formula",
+      "story": "In 1865 Dmitri Mendeleev defended his doctoral thesis <b>“On Combining Alcohol with Water”</b>. In it he calculated the ideal strength of vodka: <b>40 percent</b>. Russia has been drinking by the great chemist’s formula ever since.",
+      "answer": [
+        "The thesis is real, but it is a work of metrology: how mixtures of alcohol and water behave. It contains no recipes and nothing about effects on the body.",
+        "The 40% norm came from officials: they rounded up the old “polugar” standard (about 38%) to make excise tax easier to calculate. It was fixed in the Drinking Duties Statute of <b>1886</b>."
+      ],
+      "source": "Wikipedia (RU), “Водка”; I. S. Dmitriev, Voprosy Istorii Estestvoznaniya i Tekhniki, 1999, No. 2"
+    },
+    "verdict": "myth",
+    "country": "RU"
+  },
+  {
+    "art": "art-mincemeat.jpg",
+    "pos": "center 60%",
+    "cat": "war",
+    "pts": 2,
+    "isTrue": true,
+    "year": 1943,
+    "ru": {
+      "title": "Мертвец с портфелем",
+      "story": "В 1943 году британская разведка подбросила к берегам Испании <b>труп бездомного</b>, переодетого майором морской пехоты, с портфелем «секретных» писем. Гитлер поверил и перебросил войска в Грецию и на Сардинию, а союзники высадились <b>на Сицилии</b>.",
+      "answer": [
+        "Это операция «Минсмит». Тело Глиндура Майкла, умершего от крысиного яда, превратили в «майора Уильяма Мартина» и выпустили в море с подводной лодки. <b>30 апреля 1943 года</b> его нашёл испанский рыбак у Уэльвы.",
+        "Письма намекали, что главный удар будет по Греции, а Сицилия будет лишь отвлекающим манёвром. Гитлер приказал любой ценой защищать Грецию, Сардинию и Корсику. <b>9 июля</b> союзники высадились на Сицилии."
+      ],
+      "source": "Википедия, «Operation Mincemeat»"
+    },
+    "en": {
+      "title": "The Dead Man’s Briefcase",
+      "story": "In 1943 British intelligence planted <b>the corpse of a homeless man</b> off the coast of Spain, dressed as a Royal Marines major and carrying a briefcase of “secret” letters. Hitler believed them and moved troops to Greece and Sardinia, while the Allies landed <b>in Sicily</b>.",
+      "answer": [
+        "This was Operation Mincemeat. The body of Glyndwr Michael, who had died from rat poison, became “Major William Martin” and was released into the sea from a submarine. A Spanish fisherman found him near Huelva on <b>30 April 1943</b>.",
+        "The letters hinted that the main blow would fall on Greece, with Sicily only a feint. Hitler ordered Greece, Sardinia and Corsica defended at all costs. On <b>9 July</b> the Allies landed in Sicily."
+      ],
+      "source": "Wikipedia, “Operation Mincemeat”"
+    },
+    "verdict": "true",
+    "country": "GB"
+  },
+  {
+    "art": "art-newton.jpg",
+    "pos": "center 30%",
+    "cat": "science",
+    "pts": 2,
+    "isTrue": false,
+    "year": 1666,
+    "ru": {
+      "title": "Озарение в саду",
+      "story": "В 1666 году Исаак Ньютон сидел в саду под яблоней, и <b>яблоко упало ему на голову</b>. От удара его осенило, и так был открыт закон всемирного тяготения.",
+      "answer": [
+        "Яблоко было, удара не было. Сам Ньютон рассказывал биографу Уильяму Стьюкли, что идея пришла, когда он <b>увидел</b>, как падает яблоко, и задумался: почему оно всегда летит к центру Земли?",
+        "Закон тяготения он опубликовал только через 21 год, в «Началах» <b>1687 года</b>. А та самая яблоня в Вулсторпе жива до сих пор: около 1816 года её повалила буря, но она снова выросла из корней."
+      ],
+      "source": "Википедия, «Isaac Newton»; рукопись воспоминаний У. Стьюкли, 1752"
+    },
+    "en": {
+      "title": "A Flash in the Garden",
+      "story": "In 1666 Isaac Newton was sitting under an apple tree when <b>an apple fell on his head</b>. The blow gave him his big idea, and that is how the law of universal gravitation was discovered.",
+      "answer": [
+        "There was an apple, but no bump. Newton himself told his biographer William Stukeley that the idea came when he <b>watched</b> an apple fall and wondered: why does it always drop straight towards the centre of the Earth?",
+        "He published the law of gravitation only 21 years later, in the <i>Principia</i> of <b>1687</b>. And the tree at Woolsthorpe is still alive: a storm blew it over around 1816, but it grew back from its roots."
+      ],
+      "source": "Wikipedia, “Isaac Newton”; William Stukeley’s memoir manuscript, 1752"
+    },
+    "verdict": "myth",
+    "country": "GB"
+  },
+  {
+    "art": "art-u56.jpg",
+    "pos": "center 40%",
+    "cat": "war",
+    "pts": 3,
+    "isTrue": false,
+    "year": 1939,
+    "ru": {
+      "title": "Три торпеды",
+      "story": "30 октября 1939 года немецкая подлодка <span style=\"white-space:nowrap\">U-56</span> выпустила три торпеды в британский линкор «Нельсон». На борту был <b>Уинстон Черчилль</b> с двумя адмиралами. Две торпеды ударили в борт и <b>не взорвались</b>.",
+      "answer": [
+        "Атака была: Вильгельм Цан подвёл <span style=\"white-space:nowrap\">U-56</span> к «Нельсону» на 800 метров и выпустил три торпеды. У цели ни одна не сработала. Дёниц знал, в чём дело: у немцев отказывали торпеды G7e.",
+        "А вот <b>Черчилля на борту не было</b>. По судовому журналу «Нельсона», он и адмиралы Паунд и Форбс поднялись на корабль только на следующий день, <b>31 октября</b>, в Гриноке. А прозвище «человек, который чуть не убил Черчилля» Цану дали сами немецкие подводники."
+      ],
+      "source": "Википедия, «German submarine U-56 (1938)»; Showell, 1973, с. 34–35"
+    },
+    "en": {
+      "title": "Three Torpedoes",
+      "story": "On 30 October 1939 the German submarine <span style=\"white-space:nowrap\">U-56</span> fired three torpedoes at the British battleship <i>Nelson</i>. <b>Winston Churchill</b> was on board with two admirals. Two torpedoes hit the hull and <b>did not explode</b>.",
+      "answer": [
+        "The attack was real: Wilhelm Zahn brought <span style=\"white-space:nowrap\">U-56</span> within 800 metres of <i>Nelson</i> and fired three torpedoes. None went off at the target. Dönitz knew why: the German G7e torpedoes kept failing.",
+        "But <b>Churchill was not on board</b>. According to <i>Nelson</i>’s log, he and Admirals Pound and Forbes came aboard only the next day, <b>31 October</b>, at Greenock. The tale of “almost killing Churchill” is a U-boat legend."
+      ],
+      "source": "Wikipedia, “German submarine U-56 (1938)”; Showell, 1973, pp. 34–35"
+    },
+    "verdict": "myth",
+    "country": "DE"
+  },
+  {
+    "art": "art-endurance.jpg",
+    "pos": "center 40%",
+    "cat": "expedition",
+    "pts": 2,
+    "isTrue": true,
+    "year": 1915,
+    "ru": {
+      "title": "Все до одного",
+      "story": "В 1915 году льды Антарктиды раздавили корабль британской экспедиции. 28 человек полтора года провели во льдах, в шлюпках и на голом острове и <b>выжили все до одного</b>.",
+      "answer": [
+        "Это экспедиция Эрнеста Шеклтона на корабле «Эндьюранс». Корабль вмёрз в лёд моря Уэдделла в январе 1915-го, в октябре его пришлось покинуть. Шеклтон с пятью спутниками прошёл <b>1300 км</b> по океану на открытой шлюпке до Южной Георгии, а потом 36 часов шёл через горы к китобоям.",
+        "<b>30 августа 1916 года</b> последних людей сняли с острова Элефант. Сам «Эндьюранс» нашли в 2022 году на глубине <b>3008 метров</b>, почти целым."
+      ],
+      "source": "Википедия, «Imperial Trans-Antarctic Expedition», «Endurance (1912 ship)»"
+    },
+    "en": {
+      "title": "Every Last Man",
+      "story": "In 1915 Antarctic ice crushed the ship of a British expedition. Its 28 men spent a year and a half on the ice, in open boats and on a barren island, and <b>every single one survived</b>.",
+      "answer": [
+        "This was Ernest Shackleton’s expedition aboard <i>Endurance</i>. The ship froze into the Weddell Sea ice in January 1915 and had to be abandoned in October. Shackleton and five companions sailed <b>1,300 km</b> in an open boat to South Georgia, then crossed its mountains for 36 hours to reach a whaling station.",
+        "On <b>30 August 1916</b> the last men were rescued from Elephant Island. <i>Endurance</i> herself was found in 2022 at a depth of <b>3,008 metres</b>, almost intact."
+      ],
+      "source": "Wikipedia, “Imperial Trans-Antarctic Expedition”, “Endurance (1912 ship)”"
+    },
+    "verdict": "true",
+    "country": "GB"
+  },
+  {
+    "art": "art-spacepen.jpg",
+    "pos": "center",
+    "cat": "space",
+    "pts": 2,
+    "isTrue": false,
+    "year": 1965,
+    "ru": {
+      "title": "Чем писать в космосе",
+      "story": "В разгар космической гонки NASA потратило <b>миллионы долларов</b> на ручку, которая пишет в невесомости. Советские космонавты решили задачу проще: <b>взяли карандаш</b>.",
+      "answer": [
+        "NASA не платило за разработку: Пол Фишер создал ручку на свои деньги, около <b>$1 млн</b>, и запатентовал в 1965 году. В 1967-м NASA купило около 400 готовых ручек по $2,95.",
+        "Карандаш в невесомости опасен: обломки грифеля и графитовая пыль летают по кабине и лезут в электронику, а дерево горит. СССР тоже перешёл на ручки Фишера и в <b>1969 году</b> купил 100 штук."
+      ],
+      "source": "Википедия, «Space pen»"
+    },
+    "en": {
+      "title": "Writing in Orbit",
+      "story": "At the height of the space race NASA spent <b>millions of dollars</b> developing a pen that writes in zero gravity. Soviet cosmonauts solved the problem more simply: <b>they used a pencil</b>.",
+      "answer": [
+        "NASA paid nothing for the development: Paul Fisher built the pen with his own money, about <b>$1 million</b>, and patented it in 1965. In 1967 NASA bought around 400 finished pens at $2.95 each.",
+        "Pencils are dangerous in zero gravity: broken tips and graphite dust float around the cabin and get into electronics, and the wood burns. The USSR switched to Fisher pens too, buying 100 of them in <b>1969</b>."
+      ],
+      "source": "Wikipedia, “Space pen”"
+    },
+    "verdict": "myth",
+    "country": "US"
+  },
+  {
+    "art": "art-peter.jpg",
+    "pos": "center 8%",
+    "cat": "rulers",
+    "pts": 1,
+    "isTrue": true,
+    "year": 1705,
+    "ru": {
+      "title": "Квитанция за бороду",
+      "story": "Пётр I обложил бороды налогом. Бородач платил <b>до 100 рублей в год</b> и получал медный жетон с надписью <b>«Деньги взяты»</b>. Это была квитанция за право не бриться.",
+      "answer": [
+        "Указ от <b>16 января 1705 года</b>: от 30 до 100 рублей в год в зависимости от сословия. Квитанцией служил медный «бородовой знак» с бородой и усами.",
+        "Крестьяне пошлину не платили, но при каждом въезде в город отдавали копейку «с бороды». Отменили налог только в <b>1772 году</b>."
+      ],
+      "source": "Википедия, «Бородовой знак»; указ Петра I от 16 (27) января 1705 г."
+    },
+    "en": {
+      "title": "A Receipt for a Beard",
+      "story": "Peter the Great put a tax on beards. A bearded man paid <b>up to 100 roubles a year</b> and received a copper token stamped <b>“Money taken”</b>, a receipt for the right not to shave.",
+      "answer": [
+        "Decree of <b>16 January 1705</b>: from 30 to 100 roubles a year depending on social rank. The receipt was a copper “beard token” showing a beard and moustache.",
+        "Peasants were exempt, but paid a kopeck “per beard” every time they entered a town. The tax was abolished only in <b>1772</b>."
+      ],
+      "source": "Wikipedia (RU), “Бородовой знак”; decree of Peter I, 16 (27) January 1705"
+    },
+    "verdict": "true",
+    "country": "RU"
+  },
+  {
+    "art": "art-salieri.jpg",
+    "pos": "center 30%",
+    "cat": "music",
+    "pts": 2,
+    "isTrue": false,
+    "year": 1791,
+    "ru": {
+      "title": "Чёрная зависть",
+      "story": "Придворный композитор Антонио Сальери завидовал гению Моцарта и <b>отравил его</b> в 1791 году. Перед смертью Сальери <b>сам признался</b> в убийстве.",
+      "answer": [
+        "Доказательств отравления нет, а симптомы последней болезни Моцарта на яд не указывают. Слух пошёл через десятилетия после его смерти, а прославили его Пушкин, Римский-Корсаков и фильм «Амадей».",
+        "В 1823 году тяжело больной Сальери в помрачении будто бы обвинил себя, но в ясные минуты отказывался от этих слов. При жизни Моцарта они даже вместе написали кантату, а потом Сальери учил его младшего сына."
+      ],
+      "source": "Википедия, «Antonio Salieri»; The Guardian, 19.12.2003"
+    },
+    "en": {
+      "title": "Deadly Envy",
+      "story": "The court composer Antonio Salieri envied Mozart’s genius and <b>poisoned him</b> in 1791. Before his death Salieri <b>confessed</b> to the murder himself.",
+      "answer": [
+        "There is no evidence of poisoning, and the symptoms of Mozart’s last illness do not point to it. The rumour began decades after his death and was made famous by Pushkin, Rimsky-Korsakov and the film <i>Amadeus</i>.",
+        "In 1823 the gravely ill Salieri reportedly accused himself while delirious, but took it back in lucid moments. In Mozart’s lifetime the two even wrote a cantata together, and later Salieri taught Mozart’s younger son."
+      ],
+      "source": "Wikipedia, “Antonio Salieri”; The Guardian, 19 Dec 2003"
+    },
+    "verdict": "myth",
+    "country": "AT"
+  },
+  {
+    "art": "art-koepcke.jpg",
+    "pos": "center 50%",
+    "cat": "survival",
+    "pts": 3,
+    "isTrue": true,
+    "year": 1971,
+    "ru": {
+      "title": "Чудесное спасение",
+      "story": "В сочельник 1971 года в самолёт над Перу ударила молния. 17-летняя пассажирка упала <b>с высоты 3 км</b>, пристёгнутая к креслу, и выжила. Потом <b>11 дней</b> одна выбиралась из джунглей Амазонии.",
+      "answer": [
+        "Её звали Юлиана Кёпке. Рейс LANSA 508, 24 декабря 1971 года: из 92 человек на борту погиб 91. По версии экспертов, падение замедлил ряд из трёх кресел, к которому она была пристёгнута, а ещё восходящий поток грозы и густая листва.",
+        "Со сломанной ключицей и сотрясением мозга она шла вдоль ручья к реке. На девятый день вышла к лагерю лесорубов, и они на каноэ доставили её к людям. Позже Юлиана стала зоологом и возглавила фонд станции «Пангуана» в Амазонии."
+      ],
+      "source": "Википедия, «Juliane Koepcke», «LANSA Flight 508»; The Guardian, 2024"
+    },
+    "en": {
+      "title": "A Miraculous Survival",
+      "story": "On Christmas Eve 1971 lightning struck a plane over Peru. A 17-year-old passenger fell <b>3 km</b>, still strapped to her seat, and survived. Then she spent <b>11 days</b> alone finding her way out of the Amazon jungle.",
+      "answer": [
+        "Her name was Juliane Koepcke. LANSA Flight 508, 24 December 1971: of 92 people on board, 91 died. Experts believe her fall was slowed by the row of three seats she was strapped into, by the thunderstorm’s updraft and by the dense foliage.",
+        "With a broken collarbone and a concussion she followed a creek to a river. On the ninth day she reached a loggers’ camp, and the loggers took her by canoe to safety. Juliane later became a zoologist and the director of the Panguana research station’s foundation in the Amazon."
+      ],
+      "source": "Wikipedia, “Juliane Koepcke”, “LANSA Flight 508”; The Guardian, 2024"
+    },
+    "verdict": "true",
+    "country": "PE"
+  },
+  {
+    "art": "art-ostrich.jpg",
+    "pos": "center",
+    "cat": "nature",
+    "pts": 1,
+    "isTrue": false,
+    "year": 77,
+    "ru": {
+      "title": "Страусиная тактика",
+      "story": "Ещё римский учёный Плиний Старший заметил: почуяв опасность, страус <b>прячет голову в песок</b>. Ему кажется, что раз он никого не видит, то и его не видно.",
+      "answer": [
+        "Страусы так не делают. Плиний, кстати, писал не про песок, а про куст: будто страус суёт голову и шею в заросли и думает, что спрятался целиком.",
+        "Откуда миф: в опасности страус ложится и прижимает шею к земле, и издали кажется, что головы нет. А ещё он клювом переворачивает яйца в ямке в песке и глотает камешки для пищеварения."
+      ],
+      "source": "Википедия, «Common ostrich»"
+    },
+    "en": {
+      "title": "Ostrich Tactics",
+      "story": "Long ago the Roman scholar Pliny the Elder noticed: when an ostrich senses danger, it <b>buries its head in the sand</b>. It thinks that if it can’t see anyone, no one can see it.",
+      "answer": [
+        "Ostriches don’t do this. Pliny, by the way, wrote not about sand but about a bush: the bird supposedly thrusts its head and neck into a thicket and believes its whole body is hidden.",
+        "Where the myth comes from: in danger an ostrich lies down and presses its neck to the ground, so from afar it looks headless. It also turns its eggs with its beak in a hole in the sand, and swallows pebbles to help digestion."
+      ],
+      "source": "Wikipedia, “Common ostrich”"
+    },
+    "verdict": "myth",
+    "country": "WORLD"
+  },
+  {
+    "art": "art-roulette.jpg",
+    "pos": "center",
+    "cat": "culture",
+    "pts": 2,
+    "isTrue": false,
+    "year": 1840,
+    "ru": {
+      "title": "Офицерская забава",
+      "story": "Смертельную забаву придумали <b>русские офицеры</b> в XIX веке: один патрон в барабане револьвера, крутануть, выстрелить себе в висок. Похожее пари описал даже Лермонтов в «Герое нашего времени».",
+      "answer": [
+        "Нет ни одного документа, что русские офицеры так играли. Выражение впервые появилось <b>30 января 1937 года</b> в рассказе Жоржа Сюрде в американском журнале Collier’s: о «русской» игре там рассказывает французский сержант, якобы служивший в русской армии.",
+        "У Лермонтова в «Фаталисте» Вулич стреляет из однозарядного кремнёвого пистолета, не зная, заряжен ли он. Это пари о судьбе, а не рулетка: барабана там нет."
+      ],
+      "source": "Википедия, «Русская рулетка»; G. Surdez, Collier’s, 30.01.1937"
+    },
+    "en": {
+      "title": "An Officers’ Game",
+      "story": "This deadly pastime was invented by <b>Russian officers</b> in the 19th century: one cartridge in a revolver’s cylinder, a spin, a shot to the temple. Lermontov even described a similar wager in <i>A Hero of Our Time</i>.",
+      "answer": [
+        "There is not a single record of Russian officers playing it. The phrase first appeared on <b>30 January 1937</b> in a story by Georges Surdez in the American magazine <i>Collier’s</i>: a French sergeant there describes the “Russian” game, supposedly from his service in the Russian army.",
+        "In Lermontov’s “The Fatalist”, Vulich fires a single-shot flintlock pistol without knowing whether it is loaded. It is a wager on fate, not roulette: there is no cylinder."
+      ],
+      "source": "Wikipedia (RU), “Русская рулетка”; G. Surdez, Collier’s, 30 Jan 1937"
+    },
+    "verdict": "myth",
+    "country": "RU"
+  },
+  {
+    "art": "art-tsarbell.jpg",
+    "pos": "center 40%",
+    "cat": "history",
+    "pts": 2,
+    "isTrue": true,
+    "year": 1735,
+    "ru": {
+      "title": "Немой великан",
+      "story": "Гигантский Царь-колокол весом <b>202 тонны</b> отлили в Кремле в 1735 году. За почти 300 лет он <b>ни разу не зазвонил</b>.",
+      "answer": [
+        "Колокол отлил Михаил Моторин, закончив работу умершего отца, но повесить его не успели. По общепринятой версии, во время Троицкого пожара 1737 года раскалённый колокол заливали водой, и от резкого охлаждения пошли трещины и откололся кусок.",
+        "Почти сто лет колокол пролежал в литейной яме. В <b>1836 году</b> Огюст Монферран поднял его на постамент, где он стоит до сих пор. Звонить в расколотый колокол нельзя."
+      ],
+      "source": "Википедия, «Царь-колокол»"
+    },
+    "en": {
+      "title": "The Silent Giant",
+      "story": "The giant Tsar Bell, weighing <b>202 tonnes</b>, was cast in the Moscow Kremlin in 1735. In almost 300 years it has <b>never once rung</b>.",
+      "answer": [
+        "The bell was cast by Mikhail Motorin, who finished his late father’s work, but it was never hung. According to the accepted version, during the Trinity Fire of 1737 the hot bell was doused with water, and the sudden cooling cracked it and broke off a piece.",
+        "The bell lay in its casting pit for almost a hundred years. In <b>1836</b> Auguste de Montferrand raised it onto a pedestal, where it still stands. A cracked bell cannot be rung."
+      ],
+      "source": "Wikipedia (RU), “Царь-колокол”"
+    },
+    "verdict": "true",
+    "country": "RU"
+  },
+  {
+    "art": "art-sullivan.jpg",
+    "pos": "center 30%",
+    "cat": "survival",
+    "pts": 3,
+    "isTrue": true,
+    "year": 1942,
+    "ru": {
+      "title": "Семь ударов",
+      "story": "Смотритель американского национального парка Рой Салливан пережил <b>семь ударов молнии</b> за 35 лет. Однажды, по его словам, грозовая туча гналась за его машиной, пока не догнала.",
+      "answer": [
+        "С 1942 по 1977 год молния попадала в Салливана семь раз: на пожарной вышке, во дворе дома, в здании рейнджеров, на рыбалке. Несколько раз у него загорались волосы. Он рекордсмен Книги рекордов Гиннесса.",
+        "Последний удар, в 1977 году, настиг его у пруда с удочкой. А следом к воде вышел медведь и попытался утащить его форель, и Салливан отогнал зверя палкой."
+      ],
+      "source": "Википедия, «Roy Sullivan»; Guinness World Records 2001"
+    },
+    "en": {
+      "title": "Seven Strikes",
+      "story": "US park ranger Roy Sullivan survived <b>seven lightning strikes</b> over 35 years. Once, he said, a storm cloud chased his truck until it caught him.",
+      "answer": [
+        "From 1942 to 1977 lightning hit Sullivan seven times: in a fire lookout tower, in his front yard, inside a ranger station, while fishing. Several times his hair caught fire. He holds the Guinness World Record.",
+        "The last strike, in 1977, found him at a pond with a fishing rod. Then a bear came down to the water and tried to steal his trout, and Sullivan drove it off with a branch."
+      ],
+      "source": "Wikipedia, “Roy Sullivan”; Guinness World Records 2001"
+    },
+    "verdict": "true",
+    "country": "US"
+  },
+  {
+    "art": "art-vikings.jpg",
+    "pos": "center",
+    "cat": "expedition",
+    "pts": 2,
+    "isTrue": true,
+    "year": 1021,
+    "ru": {
+      "title": "Раньше Колумба",
+      "story": "За <b>471 год до Колумба</b> викинги доплыли до Америки и построили поселение на Ньюфаундленде. Учёные даже знают точный год, когда они рубили там деревья: <b>1021-й</b>.",
+      "answer": [
+        "Поселение Л’Анс-о-Медоуз на Ньюфаундленде в 1960 году нашли норвежцы Хельге и Анне Стине Ингстад: восемь построек из дёрна на деревянном каркасе и больше 800 скандинавских предметов.",
+        "В 2021 году журнал Nature назвал точную дату: дерево здесь срубили в <b>1021 году</b> металлическим инструментом, которого у местных жителей не было. Год вычислили по «метке» 993 года в годичных кольцах."
+      ],
+      "source": "Википедия, «L’Anse aux Meadows», «Vinland»; Nature, 20.10.2021"
+    },
+    "en": {
+      "title": "Before Columbus",
+      "story": "<b>471 years before Columbus</b>, Vikings sailed to America and built a settlement in Newfoundland. Scientists even know the exact year they were cutting trees there: <b>1021</b>.",
+      "answer": [
+        "Norwegians Helge and Anne Stine Ingstad found the L’Anse aux Meadows settlement in Newfoundland in 1960: eight buildings of sod over wooden frames and more than 800 Norse objects.",
+        "In 2021 the journal <i>Nature</i> gave the exact date: wood here was cut in <b>1021</b> with metal tools the local people did not have. The year was pinned down by a “marker” of 993 in the tree rings."
+      ],
+      "source": "Wikipedia, “L’Anse aux Meadows”, “Vinland”; Nature, 20 Oct 2021"
+    },
+    "verdict": "true",
+    "country": "NO"
+  },
+  {
+    "art": "art-lightcat.jpg",
+    "pos": "center 55%",
+    "cat": "history",
+    "pts": 3,
+    "isTrue": false,
+    "verdict": "fake",
+    "year": 1903,
+    "ru": {
+      "title": "Жалованье с хвостом",
+      "story": "С 1903 года Норвегия платила смотрителям маяков надбавку на кошку: <b>2 кроны в месяц</b>. Кошки охраняли от крыс запасы масла и фитилей для фонарей. Последнюю «маячную кошку» сняли с довольствия в <b>2002 году</b>, когда маяки перевели на автоматику.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Правда в ней только обстановка: вдоль побережья Норвегии тысячи навигационных огней, и маяки сегодня почти все автоматические.",
+        "А вот британская почта действительно платила кошкам: с 1868 года три кошки в лондонском отделе денежных переводов получали <b>шиллинг в неделю</b> на прокорм за ловлю мышей."
+      ],
+      "source": "Википедия, «Lighthouses in Norway»; The Postal Museum, «Chief Mouser: The Post Office Cats»"
+    },
+    "en": {
+      "title": "A Salary with a Tail",
+      "story": "From 1903 Norway paid its lighthouse keepers a cat allowance: <b>2 kroner a month</b>. The cats guarded the lamp oil and wicks from rats. The last “lighthouse cat” was taken off the payroll in <b>2002</b>, when the lights were automated.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> Only the setting is real: Norway keeps thousands of navigation lights along its coast, and today its lighthouses are almost all automated.",
+        "But the British Post Office really did pay cats: from 1868 three cats at the London Money Order Office received <b>a shilling a week</b> for their keep, in return for catching mice."
+      ],
+      "source": "Wikipedia, “Lighthouses in Norway”; The Postal Museum, “Chief Mouser: The Post Office Cats”"
+    },
+    "country": "NO"
+  },
+  {
+    "art": "art-baguette.jpg",
+    "pos": "center 35%",
+    "cat": "rulers",
+    "pts": 2,
+    "isTrue": false,
+    "verdict": "fake",
+    "year": 1907,
+    "ru": {
+      "title": "Утренняя доставка",
+      "story": "С 1907 по 1934 год горячий багет к завтраку президента Франции приходил по <b>парижской пневмопочте</b>: в медной капсуле, за 4 минуты, из пекарни на улице Фобур-Сент-Оноре прямо в Елисейский дворец.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Пневмопочта в Париже была настоящей: с 1866 по 1984 год письма летели в капсулах со скоростью около 24 км/ч, а к 1934 году сеть выросла до 427 км труб. Но трубы были диаметром 65–80 мм, и багет в них не пролез бы.",
+        "Зато у Елисейского дворца есть настоящая хлебная традиция: победитель ежегодного конкурса на лучший багет Парижа целый год поставляет хлеб президенту."
+      ],
+      "source": "Википедия, «Paris pneumatic post»; The Washington Post, 11.05.2023"
+    },
+    "en": {
+      "title": "Morning Delivery",
+      "story": "From 1907 to 1934 the French president’s breakfast baguette arrived by <b>the Paris pneumatic post</b>: in a copper capsule, in 4 minutes, from a bakery on Rue du Faubourg Saint-Honoré straight into the Élysée Palace.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> The pneumatic post was real: from 1866 to 1984 letters shot through Paris in capsules at about 24 km/h, and by 1934 the network had 427 km of tubes. But the tubes were 65–80 mm wide, so a baguette would never fit.",
+        "The Élysée does have a real bread tradition, though: the winner of the annual Best Baguette of Paris contest supplies the president’s bread for a whole year."
+      ],
+      "source": "Wikipedia, “Paris pneumatic post”; The Washington Post, 11 May 2023"
+    },
+    "country": "FR"
+  },
+  {
+    "art": "art-rivets.jpg",
+    "pos": "center 30%",
+    "cat": "science",
+    "pts": 3,
+    "isTrue": false,
+    "verdict": "fake",
+    "year": 1889,
+    "ru": {
+      "title": "Летний рост",
+      "story": "В жару Эйфелева башня становится выше <b>на 15 см</b>. Поэтому с 1890 года инженеры каждое лето и каждую зиму измеряют её высоту и отмечают летний «рост» <b>латунной заклёпкой</b> на опоре. Таких заклёпок там уже больше 130.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Правда в ней только начало: по данным официального сайта башни, в жару железо расширяется и башня может подрасти до 15 см, а в холод снова укоротиться.",
+        "Ни ежегодных замеров, ни латунных отметок нет. А настоящая история роста башни другая: благодаря новым антеннам на вершине она выросла с 300 до 330 метров."
+      ],
+      "source": "Официальный сайт Эйфелевой башни (toureiffel.paris); Phys.org, 2025"
+    },
+    "en": {
+      "title": "Growing Season",
+      "story": "In hot weather the Eiffel Tower grows <b>15 cm</b> taller. So since 1890 engineers have measured it every summer and winter, marking each summer’s “growth” with <b>a brass rivet</b> on one of the legs. There are now more than 130 of them.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> Only the start is true: according to the tower’s official website, the iron expands in the heat and the tower can grow by up to 15 cm, then shrink in the cold.",
+        "There are no yearly measurements and no brass markers. The tower’s real growth story is different: thanks to new antennas on top, it went from 300 to 330 metres."
+      ],
+      "source": "Official Eiffel Tower website (toureiffel.paris); Phys.org, 2025"
+    },
+    "country": "FR"
+  },
+  {
+    "pos": "center",
+    "isTrue": true,
+    "art": "art-emu.jpg",
+    "cat": "war",
+    "pts": 2,
+    "verdict": "true",
+    "year": 1932,
+    "ru": {
+      "title": "Пернатый противник",
+      "story": "В 1932 году Австралия отправила солдат с пулемётами против <b>эму</b>, которые разоряли поля фермеров. Через месяц армия отступила: птицы оказались слишком быстрыми и живучими.",
+      "answer": [
+        "Это «Война с эму». На поля Западной Австралии пришли около 20 000 эму, и туда отправили артиллеристов майора Мередита с двумя пулемётами Льюиса и 10 000 патронов. Уже 8 ноября солдат отозвали после насмешек в прессе.",
+        "Вторая попытка закончилась 10 декабря. По отчёту Мередита, на <b>986</b> убитых птиц ушло <b>9860</b> патронов, то есть ровно по десять на эму. В парламенте над «войной» открыто смеялись."
+      ],
+      "source": "Википедия, «Emu War»"
+    },
+    "en": {
+      "title": "Feathered Foe",
+      "story": "In 1932 Australia sent soldiers with machine guns against <b>emus</b> that were ruining farmers’ fields. A month later the army pulled out: the birds proved too fast and too tough.",
+      "answer": [
+        "This was the “Emu War”. Around 20,000 emus had descended on Western Australian farms, and Major Meredith’s artillerymen were sent in with two Lewis guns and 10,000 rounds. On 8 November the soldiers were withdrawn after mockery in the press.",
+        "A second attempt ended on 10 December. Meredith reported <b>986</b> birds killed with <b>9,860</b> rounds, exactly ten per emu. In Parliament the “war” was openly ridiculed."
+      ],
+      "source": "Wikipedia, “Emu War”"
+    },
+    "country": "AU"
+  },
+  {
+    "pos": "center",
+    "isTrue": true,
+    "art": "art-dance.jpg",
+    "cat": "history",
+    "pts": 2,
+    "verdict": "true",
+    "year": 1518,
+    "ru": {
+      "title": "Улица, которая танцевала",
+      "story": "Летом 1518 года в Страсбурге женщина начала танцевать посреди улицы и не могла остановиться. Через несколько дней к ней присоединились десятки людей, а к августу их было уже <b>до 400</b>. Они танцевали <b>неделями</b>.",
+      "answer": [
+        "Это «танцевальная чума» 1518 года. 14 июля фрау Трофеа начала плясать на улице у своего дома и танцевала почти неделю, прерываясь только на сон. Вскоре за ней начали повторять другие, в том числе её муж.",
+        "К августу танцующих было от 50 до 400 человек. Врачи предписали больным «вытанцевать» болезнь. Чаще всего это объясняют массовой истерией на почве стресса, есть и гипотеза об отравлении спорыньёй."
+      ],
+      "source": "Википедия, «Dancing plague of 1518»"
+    },
+    "en": {
+      "title": "The Street That Danced",
+      "story": "In the summer of 1518 a woman in Strasbourg began to dance in the street and could not stop. Within days dozens had joined her, and by August <b>up to 400 people</b> were dancing <b>for weeks</b>.",
+      "answer": [
+        "This was the dancing plague of 1518. On 14 July Frau Troffea started dancing in the street outside her house and kept going for almost a week, stopping only to sleep. Others soon began to copy her, including her husband.",
+        "By August between 50 and 400 people were dancing. Physicians told the afflicted to “dance themselves free of it”. The most popular explanation is stress-induced mass hysteria; another theory blames ergot poisoning."
+      ],
+      "source": "Wikipedia, “Dancing plague of 1518”"
+    },
+    "country": "FR"
+  },
+  {
+    "pos": "center",
+    "isTrue": true,
+    "art": "art-coffee.jpg",
+    "cat": "science",
+    "pts": 2,
+    "verdict": "true",
+    "year": 1991,
+    "ru": {
+      "title": "Под присмотром",
+      "story": "Первая в мире веб-камера смотрела на <b>кофейник</b>. Учёные Кембриджа поставили её в 1991 году, чтобы не ходить зря к пустой кофеварке, а потом за кофейником смог следить весь интернет.",
+      "answer": [
+        "Камеру в Троянской комнате компьютерной лаборатории Кембриджа сделали Квентин Стаффорд-Фрейзер и Пол Ярдецкий в 1991 году. Сначала картинку видели только в сети лаборатории, а после 1993 года, когда браузеры научились показывать изображения, её увидел весь мир.",
+        "Трансляцию выключили в 2001 году. Последнюю кофеварку, Krups, продали на eBay за <b>3350 фунтов</b>."
+      ],
+      "source": "Википедия, «Trojan Room coffee pot»"
+    },
+    "en": {
+      "title": "A Watched Pot",
+      "story": "The world’s first webcam was pointed at <b>a coffee pot</b>. Cambridge scientists set it up in 1991 to save themselves trips to an empty pot, and later the whole internet could watch it.",
+      "answer": [
+        "The camera in the Trojan Room of Cambridge’s computer lab was built by Quentin Stafford-Fraser and Paul Jardetzky in 1991. At first only the lab’s own network could see it; after 1993, when web browsers learned to show images, so could the world.",
+        "The feed was switched off in 2001. The last coffee machine, a Krups, sold on eBay for <b>£3,350</b>."
+      ],
+      "source": "Wikipedia, “Trojan Room coffee pot”"
+    },
+    "country": "GB"
+  },
+  {
+    "pos": "center 30%",
+    "isTrue": true,
+    "art": "art-onoda.jpg",
+    "cat": "war",
+    "pts": 2,
+    "verdict": "true",
+    "year": 1974,
+    "ru": {
+      "title": "Последний приказ",
+      "story": "Японский офицер прятался в джунглях филиппинского острова и продолжал воевать <b>почти 29 лет</b> после конца Второй мировой. Он сдался только в <b>1974 году</b>, когда к нему прилетел бывший командир и лично отменил приказ.",
+      "answer": [
+        "Это младший лейтенант Хироо Онода. В декабре 1944 года его отправили вести партизанскую войну на остров Лубанг. Листовки о капитуляции Японии он считал вражеской пропагандой.",
+        "В 1974 году его нашёл японский путешественник Норио Судзуки, но сдаваться Онода отказался. Тогда из Японии прилетел его бывший командир, майор Ёсими Танигути, и освободил его от службы. 10 марта 1974 года Онода сдался."
+      ],
+      "source": "Википедия, «Hiroo Onoda»"
+    },
+    "en": {
+      "title": "The Last Order",
+      "story": "A Japanese officer hid in the jungle of a Philippine island and kept fighting for <b>almost 29 years</b> after World War II ended. He surrendered only in <b>1974</b>, when his former commander flew in and personally cancelled his orders.",
+      "answer": [
+        "This was Second Lieutenant Hiroo Onoda. In December 1944 he was sent to wage guerrilla war on Lubang Island. He dismissed leaflets announcing Japan’s surrender as enemy propaganda.",
+        "In 1974 the Japanese adventurer Norio Suzuki found him, but Onoda still refused to surrender. So his former commanding officer, Major Yoshimi Taniguchi, flew from Japan and relieved him of duty. Onoda surrendered on 10 March 1974."
+      ],
+      "source": "Wikipedia, “Hiroo Onoda”"
+    },
+    "country": "JP"
+  },
+  {
+    "pos": "center",
+    "isTrue": true,
+    "art": "art-sharks.jpg",
+    "cat": "nature",
+    "pts": 2,
+    "verdict": "true",
+    "year": {
+      "ru": "450",
+      "en": "450"
+    },
+    "unit": {
+      "ru": "МЛН ЛЕТ",
+      "en": "MLN YEARS"
+    },
+    "ru": {
+      "title": "Старше леса",
+      "story": "Акулы появились на Земле раньше, чем <b>деревья</b>. Когда первые акулоподобные рыбы уже плавали в океане, на суше ещё не было ни одного леса.",
+      "answer": [
+        "Самая древняя чешуя акулоподобных рыб найдена в отложениях позднего ордовика: ей <b>444–458 млн лет</b>. Сами акулоподобные хрящевые рыбы вроде кладоселахии известны из девона.",
+        "А первым деревом, возможно, была <i>Wattieza</i>: её окаменелости из штата Нью-Йорк датируются примерно <b>385 млн лет</b> назад. Так что предки акул старше деревьев на десятки миллионов лет."
+      ],
+      "source": "Википедия, «Shark», «Tree»"
+    },
+    "en": {
+      "title": "Older Than Forests",
+      "story": "Sharks appeared on Earth before <b>trees</b> did. When the first shark-like fish were already swimming in the ocean, there was not a single forest on land.",
+      "answer": [
+        "The oldest shark-like scales come from Late Ordovician rocks, <b>444–458 million years</b> old. Shark-like cartilaginous fish such as <i>Cladoselache</i> are known from the Devonian.",
+        "The first tree may have been <i>Wattieza</i>, whose fossils from New York State date to about <b>385 million years</b> ago. So the ancestors of sharks are tens of millions of years older than trees."
+      ],
+      "source": "Wikipedia, “Shark”, “Tree”"
+    },
+    "country": "WORLD"
+  },
+  {
+    "pos": "center",
+    "isTrue": true,
+    "art": "art-stubbs.jpg",
+    "cat": "culture",
+    "pts": 3,
+    "verdict": "true",
+    "year": 1997,
+    "ru": {
+      "title": "Мэр с усами",
+      "story": "Двадцать лет, с 1997 по 2017 год, почётным мэром городка Талкитна на Аляске был <b>кот</b>. Посмотреть на «мэра» каждый день приезжали десятки туристов.",
+      "answer": [
+        "Кота звали Стаббс, от английского «обрубок»: хвоста у него не было. Он «занял пост» котёнком в июле 1997 года и оставался почётным мэром до смерти в 2017-м, в 20 лет. Настоящего мэра в Талкитне нет: формально это исторический район, а не город.",
+        "К Стаббсу ежедневно приезжали 30–40 туристов, ему присылали открытки и письма."
+      ],
+      "source": "Википедия, «Stubbs (cat)»"
+    },
+    "en": {
+      "title": "The Whiskered Mayor",
+      "story": "For twenty years, from 1997 to 2017, the honorary mayor of Talkeetna, Alaska, was <b>a cat</b>. Dozens of tourists came every day to meet “the mayor”.",
+      "answer": [
+        "His name was Stubbs, because he had no tail. He “took office” as a kitten in July 1997 and stayed honorary mayor until his death in 2017, aged 20. Talkeetna has no real mayor: officially it is a historic district, not a town.",
+        "Some 30–40 tourists came to see Stubbs every day, and he received cards and letters."
+      ],
+      "source": "Wikipedia, “Stubbs (cat)”"
+    },
+    "country": "US"
+  },
+  {
+    "pos": "center",
+    "isTrue": false,
+    "art": "art-chess.jpg",
+    "cat": "history",
+    "pts": 3,
+    "verdict": "fake",
+    "year": 1922,
+    "ru": {
+      "title": "Ход конём",
+      "story": "С 1922 по 1939 год в поездах лондонского метро на линии «Метрополитен» был <b>шахматный вагон</b>: столики со встроенными досками и табличка «Тишина». Недоигранную партию можно было оставить кондуктору и доиграть на обратном пути.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Шахматных вагонов в лондонском метро не было.",
+        "А настоящая история метро не менее удивительна: линия «Метрополитен» открылась 10 января 1863 года как первая в мире подземная железная дорога. Вагоны были деревянные, с газовым освещением, тянули их паровозы, и в первый же день линия перевезла 38 000 пассажиров."
+      ],
+      "source": "Википедия, «London Underground»"
+    },
+    "en": {
+      "title": "Knight’s Move",
+      "story": "From 1922 to 1939 trains on London’s Metropolitan line had <b>a chess carriage</b>: tables with built-in boards and a “Silence” sign. An unfinished game could be left with the guard and finished on the way back.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> The London Underground never had chess carriages.",
+        "Its real history is just as remarkable: the Metropolitan Railway opened on 10 January 1863 as the world’s first underground railway. Its carriages were wooden and gas-lit, steam locomotives pulled them, and 38,000 passengers rode it on the very first day."
+      ],
+      "source": "Wikipedia, “London Underground”"
+    },
+    "country": "GB"
+  },
+  {
+    "pos": "center",
+    "isTrue": false,
+    "art": "art-kilogram.jpg",
+    "cat": "science",
+    "pts": 3,
+    "verdict": "fake",
+    "year": 1889,
+    "ru": {
+      "title": "Високосные весы",
+      "story": "С 1889 года эталон килограмма, платиново-иридиевый цилиндр под Парижем, взвешивали <b>только 29 февраля</b>. Раз в четыре года трое хранителей в белых перчатках спускались в подвал и сверяли его с копиями.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Привязки к високосному году не было: эталон сверяли с копиями редко и нерегулярно, и называлось это «периодической поверкой».",
+        "Настоящий здесь сам эталон: цилиндр размером с мяч для гольфа из сплава платины и иридия сделали в Лондоне в 1879 году, а в 1889-м утвердили как килограмм. Он хранится в подвальном сейфе Международного бюро мер и весов в Сен-Клу под Парижем. С 2019 года килограмм определяют через постоянную Планка."
+      ],
+      "source": "Википедия, «International Prototype of the Kilogram»"
+    },
+    "en": {
+      "title": "Leap-Year Weigh-In",
+      "story": "From 1889 the master kilogram, a platinum-iridium cylinder kept near Paris, was weighed <b>only on 29 February</b>. Every four years three keepers in white gloves went down to the vault and checked it against its copies.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> There was no leap-year schedule: the prototype was compared with its copies rarely and irregularly, in what was called “periodic verification”.",
+        "The prototype itself is real: a golf-ball-sized cylinder of platinum and iridium, made in London in 1879 and ratified as the kilogram in 1889. It is kept in a basement vault of the International Bureau of Weights and Measures in Saint-Cloud, near Paris. Since 2019 the kilogram has been defined through the Planck constant."
+      ],
+      "source": "Wikipedia, “International Prototype of the Kilogram”"
+    },
+    "country": "FR"
+  },
+  {
+    "pos": "center",
+    "isTrue": false,
+    "art": "art-elephant.jpg",
+    "cat": "nature",
+    "pts": 2,
+    "verdict": "fake",
+    "year": 1870,
+    "ru": {
+      "title": "Почта с хоботом",
+      "story": "В 1870-х в Лондонском зоопарке почту разносил <b>слон</b>: каждое утро он обходил вольеры с кожаной сумкой и хоботом отдавал письма смотрителям. Посетители специально приходили к девяти, чтобы увидеть «почтальона».",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Слонов-почтальонов в Лондонском зоопарке не было.",
+        "Зато был знаменитый слон Джамбо, который с 1865 года жил в Лондонском зоопарке и катал на спине детей. В 1882 году его купил американский шоумен Финеас Барнум и увёз в США."
+      ],
+      "source": "Википедия, «Jumbo»"
+    },
+    "en": {
+      "title": "Mail by Trunk",
+      "story": "In the 1870s London Zoo’s mail was delivered by <b>an elephant</b>: every morning it made the rounds of the enclosures with a leather bag and handed letters to the keepers with its trunk. Visitors came by nine just to see “the postman”.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> London Zoo never had an elephant postman.",
+        "It did have Jumbo, though, a famous elephant who lived at London Zoo from 1865 and gave rides to children. In 1882 the American showman P. T. Barnum bought him and took him to the United States."
+      ],
+      "source": "Wikipedia, “Jumbo”"
+    },
+    "country": "GB"
+  },
+  {
+    "pos": "center",
+    "isTrue": false,
+    "art": "art-monaco.jpg",
+    "cat": "culture",
+    "pts": 2,
+    "verdict": "fake",
+    "year": 1950,
+    "ru": {
+      "title": "Подарок на день рождения",
+      "story": "Каждый гражданин Монако раз в год, в свой день рождения, может бесплатно крутануть рулетку в казино Монте-Карло. Традиция появилась в <b>1950 году</b>, а выигрыш по закону обязательно жертвуют на благотворительность.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> На самом деле всё наоборот: гражданам Монако запрещено входить в игровые залы казино Монте-Карло.",
+        "Играть там могут только гости княжества, а самим монегаскам нельзя, даже в день рождения."
+      ],
+      "source": "Википедия, «Monte Carlo Casino»"
+    },
+    "en": {
+      "title": "A Birthday Present",
+      "story": "Once a year, on their birthday, every citizen of Monaco may spin the roulette wheel at the Monte Carlo Casino for free. The tradition began in <b>1950</b>, and by law the winnings must go to charity.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> In fact it is the other way round: citizens of Monaco are forbidden to enter the casino’s gaming rooms.",
+        "Only visitors may play there. Monégasques may not, not even on their birthday."
+      ],
+      "source": "Wikipedia, “Monte Carlo Casino”"
+    },
+    "country": "MC"
+  }
+];
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+
+// ---------- language ----------
+const I18N = {
+  en: {
+    wordmark: 'True <span>/</span> false', year: 'YEAR', century: 'CENTURY',
+    pt: n => n === 1 ? 'point' : 'points', PT: n => n === 1 ? 'POINT' : 'POINTS',
+    believe: 'True', doubt: 'False', sure: 'Sure ×2', swipe: '← false · true →',
+    stampYes: 'True', stampNo: 'False', truth: 'True', myth: 'Myth', fake: 'Made up', frameQ: 'True or false?', what: 'What really happened',
+    said: b => `You said “${b ? 'True' : 'False'}”`, right: g => `: spot on, +${g}`, wrong: ': wrong',
+    betLoss: p => `, −${p} for the bet`, xBet: '×2 for the bet', xStreak: '×2 for the streak',
+    shuffle: 'Shuffle & start', shuffling: 'Shuffling…', next: 'Next story', results: 'Results',
+    share: 'Share', again: 'New deck', daily: 'Your deck',
+    startText: (n, reset) => `${reset ? 'You have seen every card, so the archive starts over. ' : ''}${n} ${n === 1 ? 'story' : 'stories'} you haven’t seen yet. True, myth or made up? Sure of it? Tap “Sure ×2”.`,
+    endMeta: d => `Result · ${d}`, endLine: (s, r, n, b) => `${s === 1 ? 'point' : 'points'} · ${r} of ${n} right · best streak ${b}`,
+    endNote: 'Played cards go to the archive. A new deck only has stories you haven’t seen.',
+    shareHead: d => `True / False · ${d}`, shareTail: (s, b) => `${s} ${s === 1 ? 'point' : 'points'} · streak ${b}`,
+    copied: 'Copied', copyManual: 'Selected. Copy it manually', locale: 'en-US',
+    story: 'Story', answer: 'Answer', score: 'Score', streak: 'Streak',
+    cats: { rulers: 'Rulers', history: 'History', science: 'Science', war: 'War', expedition: 'Expeditions', survival: 'Survival', space: 'Space', nature: 'Nature', culture: 'Culture', music: 'Music' },
+    reset: 'Start over', resetTitle: 'Start over?', resetNew: 'New deck', resetNewSub: 'Drop this game. Cards you have played stay in the archive.',
+    resetAll: 'Reset the archive', resetAllSub: 'Every card becomes new again, score back to zero.', cancel: 'Cancel'
+  },
+  ru: {
+    wordmark: 'Верю <span>/</span> не верю', year: 'ГОД', century: 'ВЕК',
+    pt: n => plural(n, 'очко', 'очка', 'очков'), PT: n => plural(n, 'ОЧКО', 'ОЧКА', 'ОЧКОВ'),
+    believe: 'Верю', doubt: 'Не верю', sure: 'Уверен ×2', swipe: '← не верю · верю →',
+    stampYes: 'Верю', stampNo: 'Не верю', truth: 'Правда', myth: 'Миф', fake: 'Выдумка', frameQ: 'Правда или выдумка?', what: 'Как было на самом деле',
+    said: b => `Вы сказали «${b ? 'Верю' : 'Не верю'}»`, right: g => `: в точку, +${g}`, wrong: ': мимо',
+    betLoss: p => `, −${p} за ставку`, xBet: '×2 за ставку', xStreak: '×2 за серию',
+    shuffle: 'Перемешать и начать', shuffling: 'Перемешиваем…', next: 'Следующая история', results: 'Итоги',
+    share: 'Поделиться', again: 'Новая колода', daily: 'Колода готова',
+    startText: (n, reset) => `${reset ? 'Вы видели все карты, архив начинается заново. ' : ''}${n} ${plural(n, 'история', 'истории', 'историй')}, которых вы ещё не видели. Правда, миф или выдумка? Уверены? Жмите «Уверен ×2».`,
+    endMeta: d => `Итог · ${d}`, endLine: (s, r, n, b) => `${plural(s, 'очко', 'очка', 'очков')} · угадано ${r} из ${n} · лучшая серия ${b}`,
+    endNote: 'Сыгранные карты ушли в архив. В новой колоде будут только истории, которых вы ещё не видели.',
+    shareHead: d => `Верю / не верю · ${d}`, shareTail: (s, b) => `${s} ${plural(s, 'очко', 'очка', 'очков')} · серия ${b}`,
+    copied: 'Скопировано', copyManual: 'Выделено. Скопируйте вручную', locale: 'ru-RU',
+    story: 'История', answer: 'Ответ', score: 'Очки', streak: 'Серия',
+    cats: { rulers: 'Правители', history: 'История', science: 'Наука', war: 'Война', expedition: 'Экспедиции', survival: 'Выживание', space: 'Космос', nature: 'Природа', culture: 'Культура', music: 'Музыка' },
+    reset: 'Начать заново', resetTitle: 'Начать заново?', resetNew: 'Новая колода', resetNewSub: 'Бросить эту игру. Сыгранные карты останутся в архиве.',
+    resetAll: 'Сбросить архив', resetAllSub: 'Все карты снова станут новыми, очки обнулятся.', cancel: 'Отмена'
+  }
+};
+function plural(n, one, few, many) {
+  const a = Math.abs(n), m10 = a % 10, m100 = a % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+}
+let lang = 'en';   // the app is global: English by default; the real app follows the device language
+try { const saved = localStorage.getItem('vnv-lang'); if (saved === 'ru' || saved === 'en') lang = saved; } catch (e) {}
+const t = () => I18N[lang];
+const L = c => c[lang];
+const ptsTxt = n => `${n} ${t().pt(n)}`;
+const dayLabel = () => now.toLocaleDateString(t().locale, { day: 'numeric', month: 'long' });
+
+// ---------- rules v1: one daily deck of 10, the same for everyone that day ----------
+// Only global cards go into the daily deck; regional cards (region: 'ru') wait for regional packs.
+const DAILY = 10;
+const POOL = DECK.map((c, k) => c.region ? -1 : k).filter(k => k >= 0);
+const now = new Date();
+const DAY_KEY = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+// Prototype deck: random every time, built only from cards this player hasn't seen yet (the archive lives in the browser).
+// Target mix 5 truths / 2 myths / 3 made-up; no more than three cards with the same answer in a row.
+const MIX = { true: 5, myth: 2, fake: 3 };
+const seen = new Set();
+try { JSON.parse(localStorage.getItem('vnv-seen') || '[]').forEach(id => seen.add(id)); } catch (e) {}
+const saveSeen = () => { try { localStorage.setItem('vnv-seen', JSON.stringify([...seen])); } catch (e) {} };
+const shuffle = arr => { const o = arr.slice(); for (let k = o.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [o[k], o[j]] = [o[j], o[k]]; } return o; };
+let archiveReset = false;
+function buildDeck() {
+  let unseen = POOL.filter(k => !seen.has(DECK[k].art));
+  archiveReset = false;
+  if (unseen.length === 0) { seen.clear(); saveSeen(); unseen = POOL.slice(); archiveReset = true; }
+  const by = v => shuffle(unseen.filter(k => DECK[k].verdict === v));
+  let pick = [].concat(...Object.entries(MIX).map(([v, n]) => by(v).slice(0, n)));
+  if (pick.length < DAILY) pick = pick.concat(shuffle(unseen.filter(k => !pick.includes(k))).slice(0, DAILY - pick.length));
+  let best = shuffle(pick);
+  for (let tries = 0; tries < 500; tries++) {
+    const o = shuffle(pick);
+    let run = 1, ok = true;
+    for (let k = 1; k < o.length; k++) { run = DECK[o[k]].isTrue === DECK[o[k - 1]].isTrue ? run + 1 : 1; if (run > 3) { ok = false; break; } }
+    best = o; if (ok) break;
+  }
+  return best;
+}
+
+const fresh = () => ({ phase: 'start', day: DAY_KEY, order: buildDeck(), i: 0, score: 0, results: [], gains: [], bets: [], answered: null, bet: false, streak: 0, best: 0 });
+let state = fresh();
+const cur = () => DECK[state.order[state.i]];
+const catNo = () => state.order[state.i] + 1;
+
+// Scoring: right = card price; «Sure» doubles it; after 3 right in a row every next right answer doubles too (×4 with a bet).
+// Wrong = 0, or minus the card price with a bet. The total never drops below zero.
+function gainFor(c, ok, bet, streakBefore) {
+  if (!ok) return bet ? -c.pts : 0;
+  return c.pts * (bet ? 2 : 1) * (streakBefore >= 3 ? 2 : 1);
+}
+
+// Flags of the country where each story happened (simplified SVG, so they render the same on every platform)
+const UJ = '<rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="2"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/>';
+const h3 = (a, b, c) => `<rect width="30" height="20" fill="${a}"/><rect y="6.67" width="30" height="6.67" fill="${b}"/><rect y="13.33" width="30" height="6.67" fill="${c}"/>`;
+const v3 = (a, b, c) => `<rect width="10" height="20" fill="${a}"/><rect x="10" width="10" height="20" fill="${b}"/><rect x="20" width="10" height="20" fill="${c}"/>`;
+const usStripes = Array.from({ length: 13 }, (_, k) => `<rect y="${(k * 20 / 13).toFixed(2)}" width="38" height="${(20 / 13).toFixed(2)}" fill="${k % 2 ? '#fff' : '#B22234'}"/>`).join('');
+const usStars = Array.from({ length: 12 }, (_, k) => `<circle cx="${1.9 + (k % 4) * 3.8}" cy="${1.6 + Math.floor(k / 4) * 3.3}" r=".6" fill="#fff"/>`).join('');
+const FLAGS = {
+  // [viewBox, body] in each flag's official proportions; rendered at a fixed height, width follows the ratio
+  RU: ['0 0 30 20', h3('#fff', '#0039A6', '#D52B1E')],                       // 3:2
+  FR: ['0 0 30 20', v3('#002395', '#fff', '#ED2939')],                       // 3:2
+  AT: ['0 0 30 20', h3('#ED2939', '#fff', '#ED2939')],                       // 3:2
+  PE: ['0 0 30 20', v3('#D91023', '#fff', '#D91023') +                       // 3:2, state flag with a simplified coat of arms
+    '<path d="M11.5 6.4A3.7 4.9 0 0 0 14.4 15.1M18.5 6.4A3.7 4.9 0 0 1 15.6 15.1" stroke="#2E7D32" stroke-width="1.15" fill="none" stroke-linecap="round"/>' +
+    '<path d="M13.3 6.4h3.4v3.8a1.7 2.2 0 0 1-3.4 0z" fill="#fff" stroke="#8a6d2b" stroke-width=".35"/>' +
+    '<path d="M13.47 6.57h1.53v2.4h-1.53z" fill="#79B7E8"/><path d="M13.47 8.97h3.06v1.23a1.53 2 0 0 1-3.06 0z" fill="#D91023"/><circle cx="15.85" cy="7.75" r=".55" fill="#2E7D32"/>'],
+  ES: ['0 0 30 20', '<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>'], // 3:2
+  JP: ['0 0 30 20', '<rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="6" fill="#BC002D"/>'], // 3:2
+  DE: ['0 0 50 30', '<rect width="50" height="10" fill="#000"/><rect y="10" width="50" height="10" fill="#DD0000"/><rect y="20" width="50" height="10" fill="#FFCE00"/>'], // 5:3
+  MC: ['0 0 25 20', '<rect width="25" height="10" fill="#CE1126"/><rect y="10" width="25" height="10" fill="#fff"/>'], // 5:4
+  NO: ['0 0 22 16', '<rect width="22" height="16" fill="#BA0C2F"/><rect x="6" width="4" height="16" fill="#fff"/><rect y="6" width="22" height="4" fill="#fff"/><rect x="7" width="2" height="16" fill="#00205B"/><rect y="7" width="22" height="2" fill="#00205B"/>'], // 22:16
+  PH: ['0 0 40 20', '<rect width="40" height="10" fill="#0038A8"/><rect y="10" width="40" height="10" fill="#CE1126"/><path d="M0 0 L17.32 10 L0 20z" fill="#fff"/><circle cx="5.8" cy="10" r="2.2" fill="#FCD116"/>'], // 2:1
+  CA: ['0 0 40 20', '<rect width="40" height="20" fill="#fff"/><rect width="10" height="20" fill="#D52B1E"/><rect x="30" width="10" height="20" fill="#D52B1E"/><g transform="translate(5 0)"><path d="M15 3.6l1.2 2.3 1.5-.6-.5 3 2.1-1.5.4 1.1 1.7-.3-.9 2.1 1 .6-3.1 2.1.3 1.2-3.1-.4.2 2.8h-1.2l.2-2.8-3.1.4.3-1.2-3.1-2.1 1-.6-.9-2.1 1.7.3.4-1.1 2.1 1.5-.5-3 1.5.6z" fill="#D52B1E"/></g>'], // 2:1
+  GB: ['0 0 60 30', UJ],                                                      // 2:1
+  US: ['0 0 38 20', usStripes + '<rect width="15.2" height="10.77" fill="#3C3B6E"/>' + usStars], // 19:10
+  AU: ['0 0 60 30', '<rect width="60" height="30" fill="#012169"/><g transform="scale(.5)">' + UJ + '</g><circle cx="15" cy="22.5" r="3.2" fill="#fff"/><circle cx="45" cy="6" r="1.5" fill="#fff"/><circle cx="51" cy="13" r="1.5" fill="#fff"/><circle cx="39" cy="14" r="1.5" fill="#fff"/><circle cx="45" cy="25" r="1.6" fill="#fff"/><circle cx="48" cy="17.5" r=".9" fill="#fff"/>'], // 2:1
+};
+const COUNTRY = {
+  ru: { RU: 'Россия', FR: 'Франция', AT: 'Австрия', PE: 'Перу', ES: 'Испания', MC: 'Монако', NO: 'Норвегия', PH: 'Филиппины', CA: 'Канада', GB: 'Великобритания', US: 'США', DE: 'Германия', JP: 'Япония', AU: 'Австралия', WORLD: 'Весь мир' },
+  en: { RU: 'Russia', FR: 'France', AT: 'Austria', PE: 'Peru', ES: 'Spain', MC: 'Monaco', NO: 'Norway', PH: 'Philippines', CA: 'Canada', GB: 'United Kingdom', US: 'United States', DE: 'Germany', JP: 'Japan', AU: 'Australia', WORLD: 'Worldwide' }
+};
+function flag(c) {
+  const name = COUNTRY[lang][c.country] || '';
+  if (c.country === 'WORLD' || !FLAGS[c.country]) {
+    return `<span class="flag world" role="img" aria-label="${name}" title="${name}"><svg viewBox="0 0 24 24" fill="none" stroke="#e2b545" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4.2" ry="10"/><path d="M2 12h20M4 6.5h16M4 17.5h16"/></svg></span>`;
+  }
+  const [vb, body] = FLAGS[c.country];
+  const [, , w, h] = vb.split(' ').map(Number);
+  return `<span class="flag" role="img" aria-label="${name}" title="${name}" style="width:${(20 * w / h).toFixed(1)}px"><svg viewBox="${vb}">${body}</svg></span>`;
+}
+
+function head(c, n) {
+  return `<div class="head">
+    <div class="num"><b>${pad(n)}</b></div>
+    <div class="title"><div class="tl"><h2>${L(c).title}</h2>${flag(c)}</div></div>
+  </div>`;
+}
+const yearOf = c => typeof c.year === 'object' ? c.year[lang] : c.year;
+const yearLabel = (c, T) => c.unit ? c.unit[lang] : c.century ? T.century : T.year;
+
+function youLine(c) {
+  const i = state.i, ok = state.results[i], g = state.gains[i] ?? 0, bet = state.bets[i], T = t();
+  if (ok) {
+    const why = [bet && T.xBet, (g / c.pts / (bet ? 2 : 1)) === 2 && T.xStreak].filter(Boolean).join(', ');
+    return `<div class="you ok">${T.said(state.answered)}${T.right(ptsTxt(g))}${why ? `<small>${why}</small>` : ''}</div>`;
+  }
+  return `<div class="you bad">${T.said(state.answered)}${T.wrong}${bet ? T.betLoss(ptsTxt(c.pts)) : ''}</div>`;
+}
+
+function renderCard() {
+  const c = cur(), n = catNo(), T = t(), C = L(c);
+  const ans = state.answered;
+  $('stage').innerHTML = `
+    <div class="wrap${state.bet && ans === null ? ' bet-on' : ''}" id="wrap">
+      <div class="inner${ans !== null ? ' flipped' : ''}" id="inner">
+        <section class="face front" aria-label="${T.story}">
+          <div class="vote-stamp yes" id="stYes">${T.stampYes}</div>
+          <div class="vote-stamp no" id="stNo">${T.stampNo}</div>
+          ${state.bet && ans === null ? `<div class="bet-ribbon">${T.sure}</div>` : ''}
+          ${head(c, n)}
+          <div class="art">
+            <img src="${c.art}" alt="" style="object-position:${c.pos}">
+            <div class="badges">
+              <div class="shield"><div><b>${yearOf(c)}</b><em>${yearLabel(c, T)}</em></div></div>
+              <div class="square" role="img" aria-label="${T.cats[c.cat]}" title="${T.cats[c.cat]}"><div>${ICONS[c.cat]}</div></div>
+              <div class="shield"><div><b>+${c.pts}</b><em>${T.PT(c.pts)}</em></div></div>
+            </div>
+          </div>
+          <div class="story"><div class="frame-q">${T.frameQ}</div><p>${C.story}</p></div>
+        </section>
+        <section class="face back" aria-label="${T.answer}">
+          ${head(c, n)}
+          <div class="strip">
+            <img src="${c.art}" alt="" style="object-position:${c.pos}">
+            <div class="verdict ${c.verdict}">${T[c.verdict === 'true' ? 'truth' : c.verdict]}</div>
+          </div>
+          <div class="reveal">
+            ${ans !== null ? youLine(c) : ''}
+            <div class="label">${T.what}</div>
+            <div class="answer">${C.answer.map(p => `<p>${p}</p>`).join('')}</div>
+            <p class="source">${C.source}</p>
+          </div>
+        </section>
+      </div>
+    </div>`;
+  if (ans === null) bindSwipe();
+  renderChrome();
+}
+
+function renderChrome() {
+  const T = t();
+  document.documentElement.lang = lang;
+  $('wordmark').innerHTML = T.wordmark;
+  const lb = $('lang'); lb.textContent = lang === 'en' ? 'RU' : 'EN'; lb.disabled = state.phase === 'shuffle';
+  const rb = $('reset'); rb.disabled = state.phase === 'shuffle'; rb.setAttribute('aria-label', T.reset); rb.title = T.reset;
+  lb.setAttribute('aria-label', lang === 'en' ? 'Switch to Russian' : 'Switch to English');
+  $('score').setAttribute('aria-label', T.score); $('streak').setAttribute('aria-label', T.streak);
+  $('scoreVal').textContent = state.score;
+  $('streak').hidden = !(state.phase === 'play' || state.phase === 'end') || state.streak === 0;
+  $('streakVal').textContent = state.streak;
+  $('streakX').hidden = state.streak < 3;
+  const N = state.order.length, done = state.phase === 'end';
+  $('segs').innerHTML = state.order.map((_, k) => {
+    const r = state.results[k];
+    const cls = r === true ? 'ok' : r === false ? 'bad' : (state.phase === 'play' && k === state.i ? 'now' : '');
+    return `<div class="seg ${cls}"></div>`;
+  }).join('');
+  $('count').textContent = state.phase === 'play' ? `${state.i + 1} / ${N}` : done ? `${N} / ${N}` : `0 / ${N}`;
+  const btns = $('btns'), hint = $('hint');
+  if (state.phase === 'start') {
+    hint.innerHTML = '';
+    btns.innerHTML = `<button class="btn next" id="go">${T.shuffle}</button>`;
+    $('go').onclick = shuffleAndDeal;
+  } else if (state.phase === 'shuffle') {
+    hint.innerHTML = '';
+    btns.innerHTML = `<button class="btn next" disabled>${T.shuffling}</button>`;
+  } else if (done) {
+    hint.innerHTML = '';
+    btns.innerHTML = `<button class="btn yes" id="copy">${T.share}</button><button class="btn next" id="again" style="grid-column:auto">${T.again}</button>`;
+    $('copy').onclick = copyResult;
+    $('again').onclick = () => { state = fresh(); renderStart(); shuffleAndDeal(); };
+  } else if (state.answered === null) {
+    hint.innerHTML = `<button class="bet" id="bet" aria-pressed="${state.bet}">${T.sure}</button><span>${T.swipe}</span>`;
+    $('bet').onclick = toggleBet;
+    btns.innerHTML = `<button class="btn no" id="no">${T.doubt}</button><button class="btn yes" id="yes">${T.believe}</button>`;
+    $('no').onclick = () => answer(false);
+    $('yes').onclick = () => answer(true);
+  } else {
+    hint.innerHTML = '';
+    const last = state.i === N - 1;
+    btns.innerHTML = `<button class="btn next" id="next">${last ? T.results : T.next} ${ARROW}</button>`;
+    $('next').onclick = next;
+  }
+}
+
+function setLang(l) {
+  if (state.phase === 'shuffle') return;
+  lang = l;
+  try { localStorage.setItem('vnv-lang', l); } catch (e) {}
+  if (state.phase === 'play') renderCard(); else if (state.phase === 'end') renderEnd(); else renderStart();
+}
+$('lang').onclick = () => setLang(lang === 'en' ? 'ru' : 'en');
+
+// Start over: an in-page sheet (the artifact viewer has no confirm() dialogs)
+function closeReset() { const bg = $('resetSheet'); if (bg) bg.remove(); $('reset').focus(); }
+function openReset() {
+  if (state.phase === 'shuffle' || $('resetSheet')) return;
+  const T = t();
+  document.body.insertAdjacentHTML('beforeend', `<div class="sheet-bg" id="resetSheet">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+      <h3 id="resetTitle">${T.resetTitle}</h3>
+      <button class="opt" id="resetNew" type="button"><b>${T.resetNew}</b><span>${T.resetNewSub}</span></button>
+      <button class="opt warn" id="resetAll" type="button"><b>${T.resetAll}</b><span>${T.resetAllSub}</span></button>
+      <button class="cancel" id="resetCancel" type="button">${T.cancel}</button>
+    </div></div>`);
+  const bg = $('resetSheet');
+  bg.addEventListener('click', e => { if (e.target === bg) closeReset(); });
+  $('resetCancel').onclick = closeReset;
+  $('resetNew').onclick = () => doReset(false);
+  $('resetAll').onclick = () => doReset(true);
+  $('resetNew').focus();
+}
+function doReset(all) {
+  const bg = $('resetSheet'); if (bg) bg.remove();
+  if (all) { seen.clear(); saveSeen(); }
+  state = fresh();
+  renderStart();
+}
+$('reset').onclick = openReset;
+
+function toggleBet() {
+  if (state.phase !== 'play' || state.answered !== null) return;
+  state.bet = !state.bet;
+  const b = $('bet'); if (b) b.setAttribute('aria-pressed', state.bet);
+  const w = $('wrap'); if (w) w.classList.toggle('bet-on', state.bet);
+  const front = document.querySelector('.front');
+  const rib = front && front.querySelector('.bet-ribbon');
+  if (state.bet && !rib && front) front.insertAdjacentHTML('afterbegin', `<div class="bet-ribbon">${t().sure}</div>`);
+  if (!state.bet && rib) rib.remove();
+}
+
+function answer(believe) {
+  if (state.phase !== 'play' || state.answered !== null) return;
+  const c = cur(), i = state.i;
+  const ok = believe === c.isTrue;
+  const g = gainFor(c, ok, state.bet, state.streak);
+  state.answered = believe;
+  state.results[i] = ok; state.gains[i] = g; state.bets[i] = state.bet;
+  seen.add(c.art); saveSeen();
+  state.score = Math.max(0, state.score + g);
+  state.streak = ok ? state.streak + 1 : 0;
+  state.best = Math.max(state.best, state.streak);
+  if (g > 0) { const s = $('score'); s.classList.remove('bump'); void s.offsetWidth; s.classList.add('bump'); }
+  try { navigator.vibrate && navigator.vibrate(ok ? 20 : [30, 60, 30]); } catch (e) {}
+  const wrap = $('wrap');
+  wrap.style.transition = ''; wrap.style.transform = '';
+  renderCard();
+}
+
+function next() {
+  const wrap = $('wrap');
+  const go = () => {
+    state.i += 1; state.answered = null; state.bet = false;
+    if (state.i >= state.order.length) { state.phase = 'end'; renderEnd(); return; }
+    renderCard();
+    if (reduce) return;
+    const w = $('wrap');
+    w.classList.add('entering');
+    requestAnimationFrame(() => requestAnimationFrame(() => w.classList.remove('entering')));
+  };
+  if (reduce || !wrap) return go();
+  wrap.classList.add('leaving');
+  setTimeout(go, 300);
+}
+
+function shareText() {
+  const T = t(), sq = state.results.map(r => r ? '🟩' : '🟥').join('');
+  return `${T.shareHead(dayLabel())}\n${sq}\n${T.shareTail(state.score, state.best)}`;
+}
+
+function renderEnd() {
+  const T = t(), right = state.results.filter(Boolean).length, N = state.order.length;
+  $('stage').innerHTML = `<div class="end">
+    <div class="meta">${T.endMeta(dayLabel())}</div>
+    <div class="big">${state.score}</div>
+    <p>${T.endLine(state.score, right, N, state.best)}</p>
+    <div class="share">${state.results.map((r, k) => `<i class="${r ? 'ok' : 'bad'}${state.bets[k] ? ' bet' : ''}"></i>`).join('')}</div>
+    <p>${T.endNote}</p>
+  </div>`;
+  renderChrome();
+}
+
+function copyResult() {
+  const text = shareText(), T = t();
+  const toast = msg => { const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 1600); };
+  const fallback = () => {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;left:16px;right:16px;bottom:130px;height:84px;font:14px var(--body)';
+    document.body.appendChild(ta); ta.focus(); ta.select(); toast(T.copyManual); setTimeout(() => ta.remove(), 6000);
+  };
+  try { navigator.clipboard.writeText(text).then(() => toast(T.copied), fallback); } catch (e) { fallback(); }
+}
+
+const BACK_SRC = 'back-munchausen-sm.jpg';
+const BACK = `<img src="${BACK_SRC}" alt="" decoding="sync">`;
+// Decode the card back once before any animation, so WebKit never shows an empty layer mid-shuffle
+const backReady = (() => { const im = new Image(); im.src = BACK_SRC; return (im.decode ? im.decode() : Promise.resolve()).catch(() => {}); })();
+const DECK_SIZE = 10;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const T = (x, y, r = 0, sc = 1) => `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${r}deg) scale(${sc})`;
+const rest = k => T(0, -k * 1.5);
+
+function renderStart() {
+  const L10 = t();
+  $('stage').innerHTML = `<div class="start">
+    <div class="deck" id="deck">${Array.from({ length: DECK_SIZE }, (_, k) => `<div class="cb" style="z-index:${k};transform:${rest(k)}">${BACK}</div>`).join('')}</div>
+    <div class="start-copy" id="startCopy"><h2>${L10.daily}</h2><p>${L10.startText(state.order.length, archiveReset)}</p></div>
+  </div>`;
+  document.querySelectorAll('#deck .cb').forEach((el, k) => { el._t = rest(k); });
+  renderChrome();
+}
+
+function move(el, to, duration, delay = 0, easing = 'cubic-bezier(.3,.7,.2,1)', via = null) {
+  const frames = via ? [{ transform: el._t }, { transform: via }, { transform: to }] : [{ transform: el._t }, { transform: to }];
+  const anim = el.animate(frames, { duration, delay, easing, fill: 'both' });
+  el._t = to;
+  return anim.finished.then(() => { el.style.transform = to; anim.cancel(); });
+}
+
+async function riffle() {
+  let stack = [...document.querySelectorAll('#deck .cb')];
+  const W = stack[0].offsetWidth, SW = $('stage').offsetWidth;
+  const spread = Math.min(W * 0.36, (SW - W) / 2 + W * 0.06);
+  for (let round = 0; round < 3; round++) {
+    const h = Math.ceil(stack.length / 2), lower = stack.slice(0, h), upper = stack.slice(h);
+    // cut: the lower half slides left, the upper half slides right
+    await Promise.all(stack.map((el, k) => {
+      const left = k < h, j = left ? k : k - h;
+      return move(el, T((left ? -1 : 1) * spread, -j * 1.5 + 10, left ? -8 : 8), 240);
+    }));
+    // riffle: the halves interleave card by card back into one stack
+    const merged = [];
+    let a = 0, b = 0, fromLeft = Math.random() < 0.5;
+    while (a < lower.length || b < upper.length) {
+      if ((fromLeft && a < lower.length) || b >= upper.length) merged.push(lower[a++]); else merged.push(upper[b++]);
+      fromLeft = !fromLeft;
+    }
+    await Promise.all(merged.map((el, k) => {
+      el.style.zIndex = k;
+      const side = lower.includes(el) ? -1 : 1;
+      return move(el, rest(k), 230, k * 34, 'cubic-bezier(.45,0,.2,1)', T(side * W * 0.14, -k * 1.5 - 22, side * 4));
+    }));
+    stack = merged;
+  }
+  // square the deck: one soft tap on the table
+  await Promise.all(stack.map((el, k) => el.animate(
+    [{ transform: rest(k) }, { transform: T(0, -k * 1.5 + 4, 0, 1.025) }, { transform: rest(k) }],
+    { duration: 260, easing: 'ease-out' }).finished));
+  return stack;
+}
+
+async function deal(stack) {
+  const top = stack[stack.length - 1];
+  const sr = $('stage').getBoundingClientRect(), r = top.getBoundingClientRect();
+  const sc = Math.min(sr.width / r.width, sr.height / r.height);
+  const dx = (sr.left + sr.width / 2) - (r.left + r.width / 2), dy = (sr.top + sr.height / 2) - (r.top + r.height / 2);
+  const copy = $('startCopy'); if (copy) copy.style.opacity = 0;
+  await Promise.all([
+    ...stack.slice(0, -1).map((el, k) => el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, delay: 60, fill: 'forwards' }).finished),
+    move(top, T(dx, dy, 0, sc), 360)
+  ]);
+  await top.animate([{ transform: top._t }, { transform: top._t + ' rotateY(90deg)' }], { duration: 160, easing: 'ease-in', fill: 'forwards' }).finished;
+}
+
+async function shuffleAndDeal() {
+  if (state.phase === 'shuffle') return;
+  if (!$('deck')) renderStart();
+  state.phase = 'shuffle';
+  renderChrome();
+  await backReady;
+  if (!reduce) {
+    await sleep(80);
+    const stack = await riffle();
+    await deal(stack);
+  }
+  state.phase = 'play';
+  renderCard();
+  if (!reduce) $('wrap').animate([{ transform: 'perspective(1400px) rotateY(-90deg)' }, { transform: 'perspective(1400px) rotateY(0)' }], { duration: 200, easing: 'ease-out' });
+}
+
+function bindSwipe() {
+  const wrap = $('wrap'), yes = $('stYes'), no = $('stNo');
+  let x0 = null, dx = 0, id = null;
+  const TH = 100;
+  wrap.addEventListener('pointerdown', e => {
+    if (state.answered !== null) return;
+    x0 = e.clientX; dx = 0; id = e.pointerId;
+    wrap.setPointerCapture(id);
+    wrap.style.transition = 'none';
+  });
+  wrap.addEventListener('pointermove', e => {
+    if (x0 === null) return;
+    dx = e.clientX - x0;
+    wrap.style.transform = `translateX(${dx}px) rotate(${dx / 20}deg)`;
+    yes.style.opacity = Math.max(0, Math.min(1, dx / TH));
+    no.style.opacity = Math.max(0, Math.min(1, -dx / TH));
+  });
+  const end = () => {
+    if (x0 === null) return;
+    x0 = null;
+    wrap.style.transition = '';
+    if (Math.abs(dx) > TH) { answer(dx > 0); return; }
+    wrap.style.transform = '';
+    yes.style.opacity = 0; no.style.opacity = 0;
+  };
+  wrap.addEventListener('pointerup', end);
+  wrap.addEventListener('pointercancel', end);
+}
+
+document.addEventListener('keydown', e => {
+  if ($('resetSheet')) { if (e.key === 'Escape') closeReset(); return; }
+  if (state.phase === 'start') { if (e.key === 'Enter') shuffleAndDeal(); return; }
+  if (state.phase !== 'play') return;
+  if (state.answered === null) {
+    if (e.key === 'ArrowRight') answer(true);
+    if (e.key === 'ArrowLeft') answer(false);
+    if (e.key === 'ArrowUp') toggleBet();
+  } else if (e.key === 'Enter' || e.key === 'ArrowRight') next();
+});
+
+const hot = window.claude?.hot;
+hot?.snapshot?.(() => state);
+const start = data => {
+  if (data && data.day === DAY_KEY && Array.isArray(data.order) && data.phase !== 'shuffle') state = { ...state, ...data };
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('lang')) lang = qs.get('lang') === 'ru' ? 'ru' : 'en';
+  if (qs.has('i')) {
+    state.phase = 'play'; state.order = DECK.map((_, k) => k);
+    state.i = Math.min(DECK.length - 1, +qs.get('i') || 0);
+    if (qs.has('bet')) state.bet = true;
+    if (qs.has('a')) { const c = cur(); state.answered = c.isTrue; state.results[state.i] = true; state.bets[state.i] = qs.has('bet'); state.gains[state.i] = gainFor(c, true, qs.has('bet'), 0); }
+  }
+  if (qs.has('end')) {
+    state.phase = 'end';
+    state.results = state.order.map((_, k) => k % 4 !== 2); state.bets = state.order.map((_, k) => k % 3 === 0);
+    state.score = 17; state.best = 5;
+  }
+  if (state.phase === 'play') renderCard();
+  else if (state.phase === 'end') renderEnd();
+  else { state.phase = 'start'; renderStart(); }
+};
+hot?.ready ? hot.ready(start) : start(hot?.data ?? {});
+</script>
+<script>
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+</body>
+</html>

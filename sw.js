@@ -1,0 +1,56 @@
+const CACHE = 'vnv-v1';
+const FILES = [
+ "./",
+ "art-baguette.jpg",
+ "art-chess.jpg",
+ "art-coffee.jpg",
+ "art-dance.jpg",
+ "art-elephant.jpg",
+ "art-emu.jpg",
+ "art-endurance.jpg",
+ "art-kilogram.jpg",
+ "art-koepcke.jpg",
+ "art-lightcat.jpg",
+ "art-mendeleev.jpg",
+ "art-mincemeat.jpg",
+ "art-monaco.jpg",
+ "art-newton.jpg",
+ "art-onoda.jpg",
+ "art-ostrich.jpg",
+ "art-peter.jpg",
+ "art-rivets.jpg",
+ "art-roulette.jpg",
+ "art-salieri.jpg",
+ "art-sharks.jpg",
+ "art-spacepen.jpg",
+ "art-stubbs.jpg",
+ "art-sullivan.jpg",
+ "art-tsarbell.jpg",
+ "art-u56.jpg",
+ "art-vikings.jpg",
+ "back-munchausen-sm.jpg",
+ "fonts/Oswald-500-cyrillic.woff2",
+ "fonts/Oswald-500-latin.woff2",
+ "fonts/Oswald-600-cyrillic.woff2",
+ "fonts/Oswald-600-latin.woff2",
+ "fonts/Oswald-700-cyrillic.woff2",
+ "fonts/Oswald-700-latin.woff2",
+ "fonts/RobotoCondensed-400-cyrillic.woff2",
+ "fonts/RobotoCondensed-400-latin.woff2",
+ "fonts/RobotoCondensed-400i-cyrillic.woff2",
+ "fonts/RobotoCondensed-400i-latin.woff2",
+ "fonts/RobotoCondensed-700-cyrillic.woff2",
+ "fonts/RobotoCondensed-700-latin.woff2",
+ "fonts/fonts.css",
+ "icon-180.png",
+ "icon-192.png",
+ "icon-512.png",
+ "index.html",
+ "manifest.webmanifest"
+];
+self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
+self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(r => r || fetch(e.request)));
+});
