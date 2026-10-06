@@ -1,4 +1,4 @@
-const CACHE = 'vnv-v15';
+const CACHE = 'vnv-v16';
 const FILES = [
  "./",
  "art-abba.jpg",
