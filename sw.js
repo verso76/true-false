@@ -1,4 +1,4 @@
-const CACHE = 'vnv-v8';
+const CACHE = 'vnv-v10';
 const FILES = [
  "./",
  "art-baguette.jpg",
@@ -15,11 +15,14 @@ const FILES = [
  "art-emu.jpg",
  "art-endurance.jpg",
  "art-greatwall.jpg",
+ "art-harrier.jpg",
  "art-haydn.jpg",
  "art-icecat.jpg",
+ "art-kellygang.jpg",
  "art-kilogram.jpg",
  "art-koepcke.jpg",
  "art-lightcat.jpg",
+ "art-lumiere.jpg",
  "art-magellan.jpg",
  "art-mansamusa.jpg",
  "art-marathon.jpg",
@@ -37,6 +40,7 @@ const FILES = [
  "art-rivets.jpg",
  "art-roulette.jpg",
  "art-salieri.jpg",
+ "art-santa.jpg",
  "art-sharks.jpg",
  "art-shinkansen.jpg",
  "art-spacepen.jpg",
