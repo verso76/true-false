@@ -3224,7 +3224,7 @@ function buildDeck() {
 }
 
 const TURN_MS = 25000;   // time for one card; running out counts as a wrong answer
-const fresh = () => ({ timeLeft: TURN_MS, phase: 'start', day: DAY_KEY, order: buildDeck(), i: 0, score: 0, results: [], gains: [], bets: [], answered: null, bet: false, streak: 0, best: 0 });
+const fresh = () => ({ timeLeft: TURN_MS, phase: 'start', day: DAY_KEY, deckSize: DECK.length, order: buildDeck(), i: 0, score: 0, results: [], gains: [], bets: [], answered: null, bet: false, streak: 0, best: 0 });
 let state = fresh();
 const cur = () => DECK[state.order[state.i]];
 const catNo = () => state.order[state.i] + 1;
@@ -3661,7 +3661,8 @@ const hot = window.claude?.hot;
 hot?.snapshot?.(() => ({ ...state, seenLog, seenTick }));
 const start = data => {
   if (data && data.seenLog && typeof data.seenLog === 'object' && (data.seenTick || 0) >= seenTick) { seenLog = data.seenLog; seenTick = data.seenTick || 0; saveSeen(); }
-  if (data && data.day === DAY_KEY && Array.isArray(data.order) && data.phase !== 'shuffle') { const { seenLog: _l, seenTick: _t, ...rest } = data; state = { ...state, ...rest }; }
+  // a saved deck is restored only if the card set is the same: after new cards are added, a fresh deck is dealt
+  if (data && data.day === DAY_KEY && data.deckSize === DECK.length && Array.isArray(data.order) && data.phase !== 'shuffle') { const { seenLog: _l, seenTick: _t, ...rest } = data; state = { ...state, ...rest }; }
   const qs = new URLSearchParams(location.search);
   if (qs.has('lang')) lang = qs.get('lang') === 'ru' ? 'ru' : 'en';
   if (qs.has('i')) {

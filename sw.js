@@ -1,4 +1,4 @@
-const CACHE = 'vnv-v11';
+const CACHE = 'vnv-v12';
 const FILES = [
  "./",
  "art-academie.jpg",
@@ -125,5 +125,11 @@ self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  // the page itself: network first, so a new card set shows on the first open; cache when offline
+  if (e.request.mode === 'navigate') {
+    e.respondWith(fetch(e.request).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put('index.html', copy)); return r; })
+      .catch(() => caches.match('index.html')));
+    return;
+  }
   e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(r => r || fetch(e.request)));
 });
