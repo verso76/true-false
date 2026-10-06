@@ -61,13 +61,14 @@
   .score svg { width: 18px; height: 18px; fill: var(--gold); }
   .score.bump { animation: bump .5s ease; }
   @keyframes bump { 40% { transform: scale(1.18); } }
-  .progress { display: flex; align-items: center; gap: 10px; }
-  .segs { flex: 1; display: flex; gap: 4px; }
+  .progress { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .top, .top-row { min-width: 0; }
+  .segs { flex: 1; min-width: 0; overflow: hidden; display: flex; gap: 4px; }
   .seg { flex: 1; height: 4px; border-radius: 2px; background: var(--ground-2); }
   .seg.ok { background: var(--true); }
   .seg.bad { background: var(--myth); }
   .seg.now { background: var(--muted); }
-  .count { font: 500 13px/1 var(--display); color: var(--muted); letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+  .count { flex: none; white-space: nowrap; font: 500 13px/1 var(--display); color: var(--muted); letter-spacing: .08em; font-variant-numeric: tabular-nums; }
 
   /* card stage */
   .stage { position: relative; min-height: 0; perspective: 1400px; }
@@ -264,7 +265,27 @@ const ICONS = {
   tech: '<svg viewBox="0 0 64 64" fill="#efe9dd" fill-rule="evenodd"><path d="M25.5 11.5L26.0 3.6L38.0 3.6L38.5 11.5A21.5 21.5 0 0 1 46.5 16.1L53.6 12.6L59.6 23.0L53.0 27.3A21.5 21.5 0 0 1 53.0 36.7L59.6 41.0L53.6 51.4L46.5 47.9A21.5 21.5 0 0 1 38.5 52.5L38.0 60.4L26.0 60.4L25.5 52.5A21.5 21.5 0 0 1 17.5 47.9L10.4 51.4L4.4 41.0L11.0 36.7A21.5 21.5 0 0 1 11.0 27.3L4.4 23.0L10.4 12.6L17.5 16.1A21.5 21.5 0 0 1 25.5 11.5ZM42 32a10 10 0 1 0 -20 0a10 10 0 1 0 20 0Z"/></svg>',
   law: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M32 9v47M20 58h24M9 15h46"/><circle cx="32" cy="8" r="3.5" fill="#efe9dd" stroke="none"/><path d="M15 15L7 33M15 15l8 18M49 15l-8 18M49 15l8 18" stroke-width="3"/><path d="M5 33h20a10 8 0 0 1-20 0zM39 33h20a10 8 0 0 1-20 0z" fill="#efe9dd"/></svg>',
   ads: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><g transform="translate(-3.5 -3.2) scale(1.1)"><path d="M8 25v14h9l25 13V12L17 25z"/><path d="M17 39l4 13h7l-3-11"/><path d="M50 24a11 11 0 0 1 0 16M54 17a20 20 0 0 1 0 30"/></g></svg>',
-  cinema: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round"><rect x="8" y="27" width="48" height="29" rx="2"/><path d="M8 27h48M8 27L6 15l46-8 2 12"/><path d="M16 13.5l7 11M28 11.5l7 11M40 9.5l7 11" stroke-width="3.5"/></svg>'
+  cinema: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round"><rect x="8" y="27" width="48" height="29" rx="2"/><path d="M8 27h48M8 27L6 15l46-8 2 12"/><path d="M16 13.5l7 11M28 11.5l7 11M40 9.5l7 11" stroke-width="3.5"/></svg>',
+  literature: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M32 17c-7-5-16-6-26-5v37c10-1 19 0 26 5 7-5 16-6 26-5V12c-10-1-19 0-26 5z"/><path d="M32 17v37"/></svg>',
+  language: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M6 10h34v22H22l-9 8v-8H6z"/><path d="M46 22h12v22h-6v8l-9-8H26V38"/></svg>',
+  holidays: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="24" width="48" height="12"/><path d="M12 36v22h40V36"/><path d="M32 24v34"/><path d="M32 24c-4-8-16-12-16-4 0 4 8 4 16 4zM32 24c4-8 16-12 16-4 0 4-8 4-16 4z"/></svg>',
+  fashion: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M26 15a6 6 0 1 1 9 5c-2 1-3 2-3 5v3"/><path d="M32 28L6 46c-2 2-1 5 2 5h48c3 0 4-3 2-5z"/></svg>',
+  aviation: '<svg viewBox="0 0 64 64" fill="#efe9dd"><path d="M32 4c2.4 0 4 3 4 7v13l22 12v6l-22-6v11l7 5v4l-11-3-11 3v-4l7-5V36l-22 6v-6l22-12V11c0-4 1.6-7 4-7z"/></svg>',
+  pirates: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><circle cx="32" cy="11" r="5"/><path d="M32 16v42M20 26h24"/><path d="M8 38c2 12 12 20 24 20s22-8 24-20"/><path d="M8 38l-2 6M8 38l6 3M56 38l2 6M56 38l-6 3"/></svg>',
+  transport: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M10 44H5v-9l7-3 8-11h19l10 11 9 2v10h-5"/><path d="M22 44h20"/><path d="M14 32h44"/><path d="M30 21v11"/><circle cx="16" cy="45" r="5.5"/><circle cx="48" cy="45" r="5.5"/></svg>',
+  toys: '<svg viewBox="0 0 64 64"><rect x="9" y="9" width="46" height="46" rx="9" fill="none" stroke="#efe9dd" stroke-width="4"/><g fill="#efe9dd"><circle cx="21" cy="21" r="4.5"/><circle cx="43" cy="21" r="4.5"/><circle cx="32" cy="32" r="4.5"/><circle cx="21" cy="43" r="4.5"/><circle cx="43" cy="43" r="4.5"/></g></svg>',
+  numbers: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M8 18c2-4 6-6 12-6h38"/><path d="M24 12c0 16-2 30-10 42"/><path d="M42 12c-1 14 0 30 4 38 2 4 7 5 11 1"/></svg>',
+  celebs: '<svg viewBox="0 0 64 64" fill="#efe9dd"><path d="M32 4l8 18.3 19.9 1.8-15 13.2 4.5 19.5L32 46.6 14.6 56.8l4.5-19.5-15-13.2 19.9-1.8z"/></svg>',
+  mysteries: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><circle cx="26" cy="26" r="17"/><path d="M38.5 38.5L58 58" stroke-width="7"/></svg>',
+  animals: '<svg viewBox="0 0 64 64" fill="#efe9dd"><path d="M32 30c9 0 18 11 18 19 0 6-5 8-9 7-4-1-6-3-9-3s-5 2-9 3c-4 1-9-1-9-7 0-8 9-19 18-19z"/><ellipse cx="14" cy="28" rx="5.5" ry="7" transform="rotate(-20 14 28)"/><ellipse cx="25" cy="15" rx="5.5" ry="7.5" transform="rotate(-8 25 15)"/><ellipse cx="39" cy="15" rx="5.5" ry="7.5" transform="rotate(8 39 15)"/><ellipse cx="50" cy="28" rx="5.5" ry="7" transform="rotate(20 50 28)"/></svg>',
+  geography: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M4 42L22 14l10 15 7-9 21 22"/><path d="M17 22l5 5 5-5"/><path d="M4 54c5-5 9-5 14 0s9 5 14 0 9-5 14 0 9 5 14 0"/></svg>',
+  body: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round"><path d="M25 8h14v17h17v14H39v17H25V39H8V25h17z"/></svg>',
+  jewelry: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M17 9h30l12 15-27 33L5 24z"/><path d="M5 24h54"/><path d="M24 9l-5 15 13 33 13-33-5-15"/></svg>',
+  money: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="32" cy="15" rx="20" ry="7"/><path d="M12 15v10c0 4 9 7 20 7s20-3 20-7V15"/><path d="M12 25v10c0 4 9 7 20 7s20-3 20-7V25"/><path d="M12 35v10c0 4 9 7 20 7s20-3 20-7V35"/></svg>',
+  luck: '<svg viewBox="0 0 64 64"><g fill="#efe9dd" transform="translate(0 -2)"><path d="M32 30C27 27 21 22 21 16.5a5.5 5.5 0 0 1 11-2 5.5 5.5 0 0 1 11 2C43 22 37 27 32 30z" transform="rotate(0 32 31)"/><path d="M32 30C27 27 21 22 21 16.5a5.5 5.5 0 0 1 11-2 5.5 5.5 0 0 1 11 2C43 22 37 27 32 30z" transform="rotate(90 32 31)"/><path d="M32 30C27 27 21 22 21 16.5a5.5 5.5 0 0 1 11-2 5.5 5.5 0 0 1 11 2C43 22 37 27 32 30z" transform="rotate(180 32 31)"/><path d="M32 30C27 27 21 22 21 16.5a5.5 5.5 0 0 1 11-2 5.5 5.5 0 0 1 11 2C43 22 37 27 32 30z" transform="rotate(270 32 31)"/></g><path d="M34 32c3 9 8 17 16 23" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linecap="round"/></svg>',
+  records: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M18 8h28v14a14 14 0 0 1-28 0z"/><path d="M18 13H8c0 9 4 14 11 15M46 13h10c0 9-4 14-11 15"/><path d="M32 36v10M22 56h20l-3-10H25z"/></svg>',
+  architecture: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M32 3v8M26 59V27l6-16 6 16v32"/><path d="M14 59V35h12M38 35h12v24"/><path d="M6 59h52"/><path d="M30 33h4M30 41h4M30 49h4"/></svg>',
+  drinks: '<svg viewBox="0 0 64 64" fill="none" stroke="#efe9dd" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M8 26h38v12a19 19 0 0 1-38 0z"/><path d="M46 30h4a7 7 0 0 1 0 14h-6"/><path d="M18 18c-3-4 3-6 0-10M27 18c-3-4 3-6 0-10M36 18c-3-4 3-6 0-10"/><path d="M6 60h42"/></svg>'
 };
 const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
@@ -524,7 +545,7 @@ const DECK = [
   {
     "art": "art-ostrich.jpg",
     "pos": "center",
-    "cat": "nature",
+    "cat": "animals",
     "pts": 1,
     "isTrue": false,
     "year": 77,
@@ -861,7 +882,7 @@ const DECK = [
     "pos": "center",
     "isTrue": true,
     "art": "art-sharks.jpg",
-    "cat": "nature",
+    "cat": "animals",
     "pts": 2,
     "verdict": "true",
     "year": {
@@ -980,7 +1001,7 @@ const DECK = [
     "pos": "center",
     "isTrue": false,
     "art": "art-elephant.jpg",
-    "cat": "nature",
+    "cat": "animals",
     "pts": 2,
     "verdict": "fake",
     "year": 1870,
@@ -1617,7 +1638,7 @@ const DECK = [
     "pos": "center 35%",
     "isTrue": true,
     "art": "art-harrier.jpg",
-    "cat": "ads",
+    "cat": "money",
     "pts": 2,
     "verdict": "true",
     "country": "US",
@@ -1645,7 +1666,7 @@ const DECK = [
     "pos": "center 30%",
     "isTrue": false,
     "art": "art-santa.jpg",
-    "cat": "ads",
+    "cat": "money",
     "pts": 2,
     "verdict": "myth",
     "country": "US",
@@ -1724,6 +1745,1378 @@ const DECK = [
       ],
       "source": "Wikipedia, “L’Arrivée d’un train en gare de La Ciotat”"
     }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-bradbury.jpg",
+    "cat": "literature",
+    "pts": 2,
+    "verdict": "true",
+    "country": "US",
+    "year": 1950,
+    "ru": {
+      "title": "Повременная оплата",
+      "story": "Весной 1950 года молодой американский писатель нашёл в подвале университетской библиотеки комнату с пишущими машинками напрокат: 10 центов за полчаса. Он бросал монеты в счётчик и за девять дней написал повесть, из которой вырос знаменитый роман. Аренда обошлась ему <b>в 9 долларов 80 центов</b>.",
+      "answer": [
+        "Это Рэй Брэдбери и библиотека Пауэлла в UCLA. Издатель попросил удвоить повесть «Пожарный», Брэдбери вернулся в ту же комнату ещё на 9 дней, и в 1953 году вышел <b>«451° по Фаренгейту»</b>.",
+        "На 9,80 доллара выходило 49 часов за машинкой. А название подсказал начальник пожарной охраны Лос-Анджелеса: бумага загорается при 451 °F."
+      ],
+      "source": "Википедия, «Ray Bradbury», «Fahrenheit 451»; Open Culture"
+    },
+    "en": {
+      "title": "Paid by the Half Hour",
+      "story": "In the spring of 1950 a young American writer found a room in a university library basement where typewriters were rented out at 10 cents per half hour. Feeding dimes into the timer, he wrote a novella in nine days that grew into a famous novel. The rental cost him <b>$9.80</b>.",
+      "answer": [
+        "It was Ray Bradbury, at UCLA’s Powell Library. Asked to double his novella “The Fireman”, he went back to the same room for another 9 days, and in 1953 it became <b><i>Fahrenheit 451</i></b>.",
+        "$9.80 bought 49 hours at the keys. The title came from the Los Angeles fire chief, who told him that book paper burns at 451 °F."
+      ],
+      "source": "Wikipedia, “Ray Bradbury”, “Fahrenheit 451”; Open Culture"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-sixwords.jpg",
+    "cat": "literature",
+    "pts": 2,
+    "verdict": "myth",
+    "country": "US",
+    "year": 1989,
+    "ru": {
+      "title": "Сестра таланта",
+      "story": "Эрнест Хемингуэй поспорил с друзьями-писателями на 10 долларов, что сочинит целый рассказ из шести слов. И выиграл, написав на салфетке: <b>«For sale: baby shoes, never worn»</b>, то есть «Продаются детские ботиночки, неношеные». Друзья молча заплатили.",
+      "answer": [
+        "Нет ни одного свидетельства, что это написал Хемингуэй. Историю о споре впервые рассказали в пьесе о нём в 1989 году, через 28 лет после его смерти.",
+        "Сама фраза гораздо старше: ещё в 1917 году статья для писателей предлагала назвать рассказ <b>«Маленькие туфельки, ни разу не надёванные»</b>."
+      ],
+      "source": "Википедия, «For sale: baby shoes, never worn»; Quote Investigator"
+    },
+    "en": {
+      "title": "The Soul of Wit",
+      "story": "Ernest Hemingway once bet his fellow writers $10 that he could write a complete story in just six words. He won by writing on a napkin: <b>“For sale: baby shoes, never worn.”</b> His friends paid up without a word.",
+      "answer": [
+        "There is no evidence that Hemingway wrote it. The bet story first appeared in a 1989 play about him, 28 years after his death.",
+        "The line itself is much older: back in 1917 an article for writers suggested a story called <b>“Little Shoes, Never Worn.”</b>"
+      ],
+      "source": "Wikipedia, “For sale: baby shoes, never worn”; Quote Investigator"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-academie.jpg",
+    "cat": "language",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "FR",
+    "year": 1694,
+    "ru": {
+      "title": "Вступительный взнос",
+      "story": "У Французской академии есть обычай: каждый новый академик дарит её словарю <b>одно слово собственного сочинения</b>. Коллеги голосуют, и одобренное слово входит в следующее издание. Так со времён первого словаря 1694 года в нём набралось больше 700 авторских слов.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Но похожий обычай есть: новичку голосованием выбирают слово из той части словаря, над которой сейчас работают, и он рассуждает о нём экспромтом.",
+        "Жану д’Ормессону досталось «destinée», судьба. Работа идёт неспешно: 9-е издание словаря выходило 32 года, с 1992 по 2024 год."
+      ],
+      "source": "Википедия, «Académie Française»; сайт Французской академии"
+    },
+    "en": {
+      "title": "The Entry Fee",
+      "story": "The French Academy has a custom: every new member presents its dictionary with <b>a word of their own invention</b>. The members vote, and an approved word goes into the next edition. Since the first dictionary of 1694, more than 700 such words have been added.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> But a similar custom is real: members vote to give each newcomer a word from the part of the dictionary being revised, to speak on off the cuff.",
+        "Jean d’Ormesson got <i>destinée</i>, “destiny”. The work is slow: the 9th edition of the dictionary took 32 years to publish, from 1992 to 2024."
+      ],
+      "source": "Wikipedia, “Académie Française”; Académie française website"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-meegeren.jpg",
+    "cat": "culture",
+    "pts": 2,
+    "verdict": "true",
+    "country": "NL",
+    "year": 1945,
+    "ru": {
+      "title": "Следственный эксперимент",
+      "story": "В 1945 году в Нидерландах арестовали художника: во время войны он продал нацистам картину великого голландского мастера, национальное достояние. Ему грозила смертная казнь. Художник заявил, что подделал картину сам, и доказал это: <b>написал новую «старинную» картину на глазах у свидетелей</b>.",
+      "answer": [
+        "Это Хан ван Меегерен: его фальшивого Вермеера Геринг выменял на <b>137 награбленных картин</b>. В 1945 году при свидетелях он написал «Христа среди учителей» в манере Вермеера.",
+        "Обвинение в пособничестве врагу сняли: подделка не национальное достояние. Ему дали год за мошенничество, но через полтора месяца он умер от инфаркта."
+      ],
+      "source": "Википедия, «Han van Meegeren»"
+    },
+    "en": {
+      "title": "Evidence in Oils",
+      "story": "In 1945 a Dutch painter was arrested for having sold the Nazis a work by a great Dutch master, a national treasure. He faced the death penalty. The painter claimed he had forged it himself, and proved it by <b>painting a new “old master” in front of witnesses</b>.",
+      "answer": [
+        "He was Han van Meegeren. Göring had traded <b>137 looted paintings</b> for his fake Vermeer. In 1945, before witnesses, he painted <i>Jesus among the Doctors</i> in Vermeer’s style.",
+        "The collaboration charge was dropped: a forgery is no national treasure. He got a year for fraud but died of a heart attack less than two months later."
+      ],
+      "source": "Wikipedia, “Han van Meegeren”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-dennis.jpg",
+    "cat": "cinema",
+    "pts": 3,
+    "verdict": "true",
+    "country": "GB",
+    "year": 1951,
+    "ru": {
+      "title": "Двойные неприятности",
+      "story": "12 марта 1951 года британский детский журнал начал печатать комикс про хулигана Денниса по прозвищу Мучитель. В тот же день американские газеты начали печатать комикс про совсем другого мальчишку, <b>тоже Денниса и тоже Мучителя</b>. Авторы друг о друге не знали.",
+      "answer": [
+        "Британского Денниса напечатал журнал The Beano из Данди, а американского нарисовал Хэнк Кетчем, и в тот же день он вышел <b>в 16 газетах</b>. Оба выходят до сих пор.",
+        "Имена совпали случайно. Кетчем назвал героя в честь 4-летнего сына, когда жена сказала: «Твой сын просто мучитель!» А редактор The Beano взял имя из песенки."
+      ],
+      "source": "Википедия, «Dennis the Menace and Gnasher», «Dennis the Menace (U.S. comics)»; The Courier"
+    },
+    "en": {
+      "title": "Double Trouble",
+      "story": "On 12 March 1951 a British children’s comic launched a strip about a naughty boy called Dennis the Menace. That same day American newspapers launched a strip about a completely different boy, <b>also called Dennis the Menace</b>. Neither creator knew about the other.",
+      "answer": [
+        "The British Dennis debuted in <i>The Beano</i> from Dundee. The American one, drawn by Hank Ketcham, appeared the same day <b>in 16 newspapers</b>. Both still run today.",
+        "It was pure chance. Ketcham named his hero after his 4-year-old son, when his wife burst out: “Your son is a menace!” The <i>Beano</i> editor took the name from a music hall song."
+      ],
+      "source": "Wikipedia, “Dennis the Menace and Gnasher”, “Dennis the Menace (U.S. comics)”; The Courier"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-martians.jpg",
+    "cat": "cinema",
+    "pts": 3,
+    "verdict": "myth",
+    "country": "US",
+    "year": 1938,
+    "ru": {
+      "title": "В прямом эфире",
+      "story": "30 октября 1938 года американское радио передало постановку о высадке марсиан, оформленную как экстренный выпуск новостей. Миллионы слушателей приняли её за правду, и <b>по всей стране началась паника</b>: люди бежали из домов, а дороги встали в пробках.",
+      "answer": [
+        "Массовой паники не было. В тот вечер рейтинговая служба обзвонила 5000 семей: постановку Орсона Уэллса слушали <b>всего 2%</b>.",
+        "Панику раздули газеты: радио отбирало у них рекламу, и отдельные случаи испуга они выдали за «волну ужаса». За три недели вышло не меньше 12 500 статей."
+      ],
+      "source": "Википедия, «The War of the Worlds (1938 radio drama)»; Slate, 2013"
+    },
+    "en": {
+      "title": "Live on Air",
+      "story": "On 30 October 1938 American radio aired a play about a Martian landing, styled as breaking news bulletins. Millions of listeners took it for real, and <b>panic swept the country</b>: people fled their homes and jammed the roads.",
+      "answer": [
+        "There was no mass panic. That night a ratings service phoned 5,000 households: <b>only 2%</b> were listening to Orson Welles’s play.",
+        "The papers blew it up. Radio was taking their advertising, so they turned scattered cases of fright into a “wave of terror”, with at least 12,500 articles in three weeks."
+      ],
+      "source": "Wikipedia, “The War of the Worlds (1938 radio drama)”; Slate, 2013"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-parade.jpg",
+    "cat": "holidays",
+    "pts": 2,
+    "verdict": "true",
+    "country": "MX",
+    "year": 2016,
+    "ru": {
+      "title": "Город в гриме",
+      "story": "Большой парад в День мёртвых по центру Мехико, с гигантскими скелетами и праздничными платформами, впервые прошёл только в 2016 году. Старинной традицией он не был: <b>этот парад придумали для фильма</b>, а город повторил его наяву.",
+      "answer": [
+        "Это начальная сцена фильма о Бонде «007: Спектр» (2015). Такого парада в Мехико не было: для съёмок собрали 1500 статистов и <b>250 000 бумажных цветов</b>.",
+        "Фильм вызвал такой интерес, что в октябре 2016 года власти провели настоящий парад. Посмотреть его пришли около 250 000 человек, теперь это ежегодный праздник."
+      ],
+      "source": "Википедия, «Day of the Dead Parade», «Spectre (2015 film)»; TravelPulse"
+    },
+    "en": {
+      "title": "The City in Make-up",
+      "story": "Mexico City’s grand Day of the Dead parade, with giant skeletons and festive floats, was held for the first time only in 2016. It was no ancient tradition: <b>the parade was invented for a film</b>, and the city then staged it for real.",
+      "answer": [
+        "It is the opening scene of the Bond film <i>Spectre</i> (2015). No such parade existed in Mexico City: the shoot took 1,500 extras and <b>250,000 paper flowers</b>.",
+        "The film stirred so much interest that in October 2016 the city held a real parade, watched by about 250,000 people. It is now an annual event."
+      ],
+      "source": "Wikipedia, “Day of the Dead Parade”, “Spectre (2015 film)”; TravelPulse"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-gondolier.jpg",
+    "cat": "holidays",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "IT",
+    "year": 1898,
+    "ru": {
+      "title": "Под венец",
+      "story": "У венецианских гондольеров есть правило, записанное в устав их гильдии в 1898 году: везти новобрачных в свадебной гондоле может только <b>женатый гондольер</b>. Холостякам свадебные заказы не дают, чтобы не накликать беду на молодую семью.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Семейное положение гондольера никого не волнует. Требования другие: 400 часов обучения и экзамен по истории, языкам и управлению лодкой.",
+        "Лицензий в городе около 400, и первая женщина получила её только в 2010 году. А чёрными гондолы стали по старому венецианскому закону против роскоши."
+      ],
+      "source": "Википедия, «Gondola»"
+    },
+    "en": {
+      "title": "Down the Canal",
+      "story": "Venice’s gondoliers have a rule, written into their guild statutes in 1898: newlyweds may be rowed in a wedding gondola only by <b>a married gondolier</b>. Bachelors never get wedding bookings, so as not to bring bad luck to the young couple.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> Nobody cares whether a gondolier is married. The real requirements: 400 hours of training and an exam in history, languages and handling the boat.",
+        "Only about 400 licences exist, and the first woman got one in 2010. Gondolas are black because of an old Venetian law against luxury."
+      ],
+      "source": "Wikipedia, “Gondola”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-crinoline.jpg",
+    "cat": "fashion",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "GB",
+    "year": 1858,
+    "ru": {
+      "title": "Широкий жест",
+      "story": "В 1858 году крупнейшая омнибусная компания Лондона ввела правило для модниц: дама в кринолине шире 4 футов (1,2 м) <b>платила за два места</b>. Кондукторам выдали мерные рейки с медной меткой, и юбку измеряли прямо на подножке.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Двойного тарифа не было. «Новое правило для омнибусов» есть лишь в карикатуре журнала Punch 1858 года: кондуктор просит даму оставить кринолин снаружи.",
+        "Но сама проблема была настоящей. Кринолин на стальных обручах запатентовали в 1856 году, и окружность юбки доходила до 5 с лишним метров."
+      ],
+      "source": "Википедия, «Crinoline»; NYPL Digital Collections, «New omnibus regulation»"
+    },
+    "en": {
+      "title": "A Wide Berth",
+      "story": "In 1858 London’s largest omnibus company brought in a rule for fashionable ladies: a passenger whose crinoline was wider than 4 feet <b>paid for two seats</b>. Conductors were issued measuring rods with a brass mark, and skirts were checked right on the step.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> There was no double fare. The “New omnibus regulation” existed only in an 1858 <i>Punch</i> cartoon, where a conductor asks a lady to leave her crinoline outside.",
+        "The problem itself was real. The steel-hooped cage crinoline was patented in 1856, and a skirt could measure over 5 metres around."
+      ],
+      "source": "Wikipedia, “Crinoline”; NYPL Digital Collections, “New omnibus regulation”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-rooftop.jpg",
+    "cat": "aviation",
+    "pts": 2,
+    "verdict": "true",
+    "country": "FR",
+    "year": 1919,
+    "ru": {
+      "title": "Верхний этаж",
+      "story": "В январе 1919 года парижский универмаг выплатил лётчику приз в 25 000 франков, объявленный ещё до войны. Пилот посадил биплан <b>прямо на крышу магазина</b>, на террасу размером 28 на 12 метров.",
+      "answer": [
+        "Это Жюль Ведрин, звезда довоенных авиагонок. 19 января 1919 года он посадил биплан на крышу универмага Galeries Lafayette. Самолёт сильно повредило, но приз достался ему.",
+        "Полёты над Парижем были запрещены, так что вместе с призом Ведрин получил от полиции штраф в 16 франков."
+      ],
+      "source": "Википедия, «Jules Védrines»; Galeries Lafayette, «130 years of memories»"
+    },
+    "en": {
+      "title": "Top Floor",
+      "story": "In January 1919 a Paris department store paid a pilot a 25,000-franc prize it had offered before the war. He had landed his biplane <b>right on the store’s roof</b>, on a terrace 28 by 12 metres.",
+      "answer": [
+        "This was Jules Védrines, a star of prewar air races. On 19 January 1919 he landed a biplane on the roof of Galeries Lafayette. The plane was badly damaged, but the prize was his.",
+        "Flying over Paris was banned, so along with the prize Védrines got a 16-franc police fine."
+      ],
+      "source": "Wikipedia, “Jules Védrines”; Galeries Lafayette, “130 years of memories”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-moonlist.jpg",
+    "cat": "aviation",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "RU",
+    "year": 1962,
+    "ru": {
+      "title": "Дальний рейс",
+      "story": "В 1962 году «Аэрофлот» открыл запись на будущие пассажирские рейсы на Луну. Каждому, кто записался, выдавали именную карточку с номером в очереди. К 1969 году в листе ожидания было <b>больше 60 тысяч человек</b>.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> «Аэрофлот» на Луну не записывал. А вот Pan Am в 1968–1971 годах вела такой список и раздала больше 93 тысяч карточек с номером в очереди.",
+        "Говорят, всё началось в 1964 году: австрийский журналист попросил билет на Луну, и Pan Am приняла заявку. А в 1991 году авиакомпания обанкротилась."
+      ],
+      "source": "Википедия, «First Moon Flights Club»; National Air and Space Museum"
+    },
+    "en": {
+      "title": "Long Haul",
+      "story": "In 1962 Aeroflot began taking bookings for future passenger flights to the Moon. Everyone who signed up got a personal card showing their place in the queue. By 1969 the waiting list held <b>more than 60,000 people</b>.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> Aeroflot never took bookings for the Moon. But Pan Am did: from 1968 to 1971 it handed out more than 93,000 free cards numbered by place in the queue.",
+        "It reportedly began in 1964, when an Austrian journalist asked for a ticket to the Moon and Pan Am accepted. Pan Am itself went bankrupt in 1991."
+      ],
+      "source": "Wikipedia, “First Moon Flights Club”; National Air and Space Museum"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-widow.jpg",
+    "cat": "pirates",
+    "pts": 2,
+    "verdict": "true",
+    "country": "CN",
+    "year": 1810,
+    "ru": {
+      "title": "Вдовья доля",
+      "story": "В начале XIX века у берегов Китая хозяйничал союз пиратов: сотни джонок и десятки тысяч человек. После смерти главаря флотом стала командовать <b>его вдова</b>. В 1810 году она сама пришла к наместнику, выторговала помилование и ушла на покой богатой.",
+      "answer": [
+        "Это госпожа Чжэн, на Западе Ching Shih. Её муж объединил пиратов Гуандуна в союз шести флотов, а когда в 1807 году он упал за борт в шторм, союзом стала править она.",
+        "В 1810 году сдались около 17 тысяч пиратов, и почти всех помиловали. Она сохранила богатство, держала игорный дом в Кантоне и умерла в 1844 году."
+      ],
+      "source": "Википедия, «Zheng Yi Sao»; World History Encyclopedia"
+    },
+    "en": {
+      "title": "The Widow’s Share",
+      "story": "In the early 1800s a pirate alliance ruled the seas off China: hundreds of junks and tens of thousands of men. When its chief died, <b>his widow</b> took command. In 1810 she walked in to see the viceroy herself, bargained for a pardon and retired rich.",
+      "answer": [
+        "This was Zheng Yi Sao, also known as Ching Shih. Her husband united the Guangdong pirates into six fleets. When he was lost overboard in a gale in 1807, she took command.",
+        "In 1810 about 17,000 pirates surrendered, and nearly all were pardoned. She kept her fortune, ran a gambling house in Canton and died in 1844."
+      ],
+      "source": "Wikipedia, “Zheng Yi Sao”; World History Encyclopedia"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-powdermonkey.jpg",
+    "cat": "pirates",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "GB",
+    "year": 1780,
+    "ru": {
+      "title": "Пороховая команда",
+      "story": "В 1780 году британское Адмиралтейство разрешило держать на линейных кораблях <b>обученных обезьян</b>. В бою они таскали заряды из порохового погреба к пушкам: маленькие и шустрые, легко пролезали между палубами. Отсюда морское прозвище powder monkey, «пороховая обезьяна».",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Обезьяны порох на флоте не носили. Powder monkey называли юнг 12–14 лет: в бою они бегали с зарядами из порохового погреба к орудиям.",
+        "Мальчишек брали за рост и проворство: в тесноте между палубами им было легче. Прозвище появилось в XVII веке, сейчас так зовут и подрывников."
+      ],
+      "source": "Википедия, «Powder monkey»; Historic UK, «Powder Monkeys»"
+    },
+    "en": {
+      "title": "Powder Crew",
+      "story": "In 1780 the British Admiralty allowed ships of the line to keep <b>trained monkeys</b>. In battle they carried gunpowder charges from the magazine to the guns: small and quick, they slipped easily between decks. That is where the naval nickname “powder monkey” comes from.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> No monkeys ever hauled powder. “Powder monkeys” were ship’s boys, usually 12 to 14, who ran charges from the powder magazine to the guns in battle.",
+        "Boys were picked for their size and speed in the cramped decks. The nickname dates from the 1600s and today also means a demolition blaster."
+      ],
+      "source": "Wikipedia, “Powder monkey”; Historic UK, “Powder Monkeys”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-horsepower.jpg",
+    "cat": "transport",
+    "pts": 3,
+    "verdict": "true",
+    "country": "CH",
+    "year": 1900,
+    "ru": {
+      "title": "Лошадиные силы",
+      "story": "В 1900 году горный кантон Швейцарии запретил автомобили на всех своих дорогах. Приезжие глушили мотор на границе, и дальше машину <b>тащили лошади или волы</b>. Запрет продержался 25 лет: местные жители не раз голосовали за то, чтобы его сохранить.",
+      "answer": [
+        "Это Граубюнден, где Санкт-Мориц и Давос. Запрет ввели в 1900 году: машины пугали лошадей и пылили на грунтовых дорогах. Исключения давали редко, например врачам.",
+        "Отменили его лишь в 1925 году, когда «за» проголосовали 52%. За шесть лет моторного транспорта в кантоне стало почти вдесятеро больше: 2262 вместо 260."
+      ],
+      "source": "Википедия, «Grisons automobile ban»; swissinfo.ch; блог Швейцарского национального музея"
+    },
+    "en": {
+      "title": "Horsepower",
+      "story": "In 1900 a mountain canton in Switzerland banned cars from all its roads. Visiting drivers had to switch off their engines at the border, and from there the car was <b>pulled by horses or oxen</b>. The ban lasted 25 years: locals voted again and again to keep it.",
+      "answer": [
+        "This was Graubünden, home of St. Moritz and Davos. The ban came in 1900: cars scared horses and raised dust on dirt roads. Exceptions were rare, for doctors, for example.",
+        "It was lifted only in 1925, and narrowly: 52% voted yes. Within six years the number of motor vehicles in the canton grew almost tenfold, from 260 to 2,262."
+      ],
+      "source": "Wikipedia, “Grisons automobile ban”; swissinfo.ch; Swiss National Museum blog"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-tuffi.jpg",
+    "cat": "transport",
+    "pts": 3,
+    "verdict": "true",
+    "country": "DE",
+    "year": 1950,
+    "ru": {
+      "title": "Тяжёлый пассажир",
+      "story": "В 1950 году директор цирка решил прорекламировать гастроли и прокатил слониху на городской подвесной железной дороге. В тесном вагоне она запаниковала, проломила стенку и <b>прыгнула в реку</b> с высоты около 10 метров. Отделалась царапинами.",
+      "answer": [
+        "Это четырёхлетняя слониха Туффи и подвесная дорога Вупперталя над рекой Вуппер. В 1950 году директор цирка купил пять билетов: четыре для слонихи и один себе.",
+        "Река там мелкая, и Туффи упала в ил. Суд оштрафовал директора цирка и инженера, разрешившего поездку. А знаменитая открытка с летящей слонихой сделана монтажом."
+      ],
+      "source": "Википедия, «Tuffi» (английская и немецкая)"
+    },
+    "en": {
+      "title": "A Heavy Passenger",
+      "story": "In 1950 a circus director promoted his show by taking an elephant for a ride on a city’s suspended railway. In the crowded car she panicked, smashed through the side and <b>jumped into the river</b> from about 10 metres up. She got away with scratches.",
+      "answer": [
+        "This was Tuffi, a four-year-old elephant, on Wuppertal’s suspended railway above the river Wupper. In 1950 a circus director bought five tickets: four for her, one for himself.",
+        "The river is shallow there, and Tuffi landed in mud. A court fined the director and the engineer who approved the ride. The famous postcard is a montage."
+      ],
+      "source": "Wikipedia, “Tuffi” (English and German)"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-inkjet.jpg",
+    "cat": "tech",
+    "pts": 1,
+    "verdict": "true",
+    "country": "JP",
+    "year": 1977,
+    "ru": {
+      "title": "Капля за каплей",
+      "story": "В 1977 году в японской лаборатории кто-то неосторожно положил горячий паяльник рядом со шприцем, полным чернил. Паяльник коснулся иглы, и чернила <b>брызнули из неё каплями</b>. Из этой случайности выросли принтеры, которые сегодня стоят в миллионах домов.",
+      "answer": [
+        "Это лаборатория Canon. После случая с паяльником инженер Итиро Эндо понял: если нагреть чернила, пузырёк пара сам вытолкнет каплю. Патент Canon подала в том же году.",
+        "Первый принтер Bubble Jet вышел в 1985 году. Ту же идею независимо нашли в Hewlett-Packard, и сегодня так печатает большинство домашних струйных принтеров."
+      ],
+      "source": "Canon, «The history of Canon’s intellectual property in the printing field»; MIT Technology Review, «Tiny Bubbles»"
+    },
+    "en": {
+      "title": "Drop by Drop",
+      "story": "In 1977, in a Japanese lab, someone carelessly put down a hot soldering iron next to a syringe full of ink. The iron touched the needle, and the ink <b>shot out in droplets</b>. That accident grew into the printers now found in millions of homes.",
+      "answer": [
+        "The lab was Canon’s. After the soldering-iron mishap, Ichiro Endo realised that heated ink forms a vapour bubble that pushes out a drop. Canon filed the patent that same year.",
+        "The first Bubble Jet printer came out in 1985. Hewlett-Packard engineers hit on the same idea independently, and today most home inkjet printers work this way."
+      ],
+      "source": "Canon, “The history of Canon’s intellectual property in the printing field”; MIT Technology Review, “Tiny Bubbles”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-bug.jpg",
+    "cat": "tech",
+    "pts": 3,
+    "verdict": "myth",
+    "country": "US",
+    "year": 1947,
+    "ru": {
+      "title": "Незваный гость",
+      "story": "В сентябре 1947 года операторы Гарварда искали причину сбоя в компьютере Mark II и нашли в реле <b>застрявшего мотылька</b>. Его вклеили в журнал, и с тех пор компьютерные ошибки называют «багами», то есть «жуками».",
+      "answer": [
+        "Слово bug в смысле «мелкая неполадка» инженеры говорили задолго до компьютеров. Ещё в 1878 году Томас Эдисон писал, что в каждом изобретении вылезают «баги».",
+        "А мотылёк настоящий: в 1947 году его в шутку вклеили в журнал с подписью «Первый настоящий случай обнаружения бага». Историю прославила Грейс Хоппер."
+      ],
+      "source": "Википедия, «Bug (engineering)»; JSTOR Daily, «The Bug in the Computer Bug Story»"
+    },
+    "en": {
+      "title": "Uninvited Guest",
+      "story": "In September 1947 operators at Harvard hunting for a fault in the Mark II computer found <b>a moth stuck in a relay</b>. They taped it into the logbook, and ever since then computer errors have been called “bugs”.",
+      "answer": [
+        "Engineers were calling small faults “bugs” long before computers. Back in 1878 Thomas Edison wrote that every invention throws up “bugs”.",
+        "The moth was real: in 1947 it was taped into a log with the note “First actual case of bug being found”, a joke on a word already in use. Grace Hopper made the story famous."
+      ],
+      "source": "Wikipedia, “Bug (engineering)”; JSTOR Daily, “The Bug in the Computer Bug Story”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-marbles.jpg",
+    "cat": "toys",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "FR",
+    "year": 1932,
+    "ru": {
+      "title": "Мелкая монета",
+      "story": "В 1932 году кинотеатры рабочих кварталов Парижа стали пускать детей на четверговый утренник <b>за десять стеклянных шариков</b>. Мальчишки неделями выигрывали их друг у друга во дворах, а кинотеатры сдавали шарики оптом в лавки игрушек.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Шарики в кассах кино не принимали. Правда только обстановка: с 1882 по 1972 год четверг был во Франции свободным от школы днём.",
+        "А в Британии 1920–30-х годов детей правда пускали на утренник за пустые банки из-под джема: в некоторых кинотеатрах билет стоил пенни или две банки."
+      ],
+      "source": "Википедия (фр.), «Rythmes scolaires en France»; Remembering the Past, «Cinema in North Shields»"
+    },
+    "en": {
+      "title": "Small Change",
+      "story": "In 1932 cinemas in the working-class districts of Paris began letting children into the Thursday matinee <b>for ten glass marbles</b>. Boys spent weeks winning them off each other in courtyards, and the cinemas sold the marbles in bulk to toy shops.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> No box office ever took marbles. Only the setting is real: from 1882 to 1972 Thursday was the school-free day for French children.",
+        "But in 1920s and 1930s Britain, children really did get into matinees with empty jam jars: at some cinemas a ticket cost a penny or two jars."
+      ],
+      "source": "Wikipedia (French), “Rythmes scolaires en France”; Remembering the Past, “Cinema in North Shields”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-seventeen.jpg",
+    "cat": "numbers",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "IT",
+    "year": 1951,
+    "ru": {
+      "title": "Дурная примета",
+      "story": "Итальянцы боятся числа 17, как другие боятся 13. Поэтому с 1951 года в государственном лото Италии <b>нет шара с номером 17</b>: выигрышные номера тянут из 89 шаров вместо 90.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> В итальянском лото тянут пять номеров из 90, и 17 среди них есть. В неаполитанском соннике для игроков оно означает «несчастье».",
+        "Но 17 в Италии правда боятся: римское XVII можно переставить в VIXI, по-латыни «я прожил», то есть «меня больше нет». В самолётах Alitalia не было 17-го ряда."
+      ],
+      "source": "Википедия, «Heptadecaphobia», «Renault 15 and 17»; Википедия (ит.), «Lotto»"
+    },
+    "en": {
+      "title": "Bad Omen",
+      "story": "Italians fear the number 17 the way others fear 13. So since 1951 Italy’s state Lotto has had <b>no ball numbered 17</b>: the winning numbers are drawn from 89 balls instead of 90.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> Italy’s Lotto draws five numbers out of 90, and 17 is one of them. In the Neapolitan dream book used by players, 17 means “misfortune”.",
+        "But Italians really do fear 17: XVII can be rearranged into VIXI, Latin for “I have lived”, meaning “I am dead”. Alitalia planes even skipped row 17."
+      ],
+      "source": "Wikipedia, “Heptadecaphobia”, “Renault 15 and 17”; Wikipedia (Italian), “Lotto”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-napoleon.jpg",
+    "cat": "celebs",
+    "pts": 1,
+    "verdict": "myth",
+    "country": "FR",
+    "year": 1821,
+    "ru": {
+      "title": "Вопрос роста",
+      "story": "Над Наполеоном смеялась вся Европа: император был коротышкой. В 1821 году, после его смерти на острове Святой Елены, врач снял точную мерку: <b>5 футов 2 дюйма</b>, то есть около 157 см. Отсюда и выражение «комплекс Наполеона».",
+      "answer": [
+        "Рост Наполеона был около 168 см, обычный для француза его эпохи. Врач мерил его в старых французских единицах, а французский дюйм длиннее английского.",
+        "Коротышкой его сделали британские карикатуристы: с 1803 года Джеймс Гилрей рисовал «маленького Бони» злобным крошкой. Помогали и рослые гренадеры гвардии."
+      ],
+      "source": "Википедия, «Napoleon complex»; napoleon.org, «La taille de Napoléon»"
+    },
+    "en": {
+      "title": "A Matter of Height",
+      "story": "All of Europe laughed at Napoleon: the emperor was a shrimp. In 1821, after his death on St Helena, his doctor took the exact measurement: <b>5 feet 2 inches</b>, about 157 cm. Hence the phrase “Napoleon complex”.",
+      "answer": [
+        "Napoleon stood about 168 cm, average for a Frenchman of his day. His doctor measured him in old French units, and the French inch was longer than the English one.",
+        "British cartoonists made him small: from 1803 James Gillray drew “Little Boney” as a furious pint-sized tyrant. The tall grenadiers of his Guard didn’t help."
+      ],
+      "source": "Wikipedia, “Napoleon complex”; napoleon.org, “La taille de Napoléon”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-starling.jpg",
+    "cat": "celebs",
+    "pts": 2,
+    "verdict": "true",
+    "country": "AT",
+    "year": 1784,
+    "ru": {
+      "title": "Пернатый солист",
+      "story": "В мае 1784 года венский композитор купил в лавке скворца за 34 крейцера: птица насвистывала тему из его нового фортепианного концерта, только с одной фальшивой нотой. Через три года скворец умер, и хозяин устроил ему <b>похороны с процессией в траурных вуалях</b> и сочинил стихи для надгробия.",
+      "answer": [
+        "Это Моцарт. В 1784 году он записал в книгу расходов: «Скворец, 34 крейцера», нотами набросал напев птицы и приписал: «Это было прекрасно!»",
+        "Мотив почти совпадает с финалом его Концерта № 17. А когда в 1787 году скворец умер, за ним шли под густыми вуалями, и Моцарт сочинил шуточную эпитафию."
+      ],
+      "source": "Википедия, «Mozart's starling»"
+    },
+    "en": {
+      "title": "Feathered Soloist",
+      "story": "In May 1784 a Viennese composer bought a starling in a shop for 34 kreuzer: the bird was whistling a theme from his new piano concerto, with just one wrong note. Three years later it died, and its owner gave it <b>a funeral with a procession of veiled mourners</b> and wrote a poem for its gravestone.",
+      "answer": [
+        "It was Mozart. In 1784 he wrote in his expense book: “Starling bird, 34 kreuzer”, jotted down the bird’s tune and added: “That was beautiful!”",
+        "The tune nearly matches the finale of his Piano Concerto No. 17. When the starling died in 1787, mourners followed it heavily veiled, and Mozart wrote a comic epitaph."
+      ],
+      "source": "Wikipedia, “Mozart’s starling”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-pharaoh.jpg",
+    "cat": "mysteries",
+    "pts": 1,
+    "verdict": "myth",
+    "country": "EG",
+    "year": 1923,
+    "ru": {
+      "title": "Цена находки",
+      "story": "Проклятие фараона сработало. В 1923 году, меньше чем через два месяца после вскрытия погребальной камеры Тутанхамона, умер лорд, оплативший раскопки. А из тех, кто был при вскрытии гробницы и саркофага, <b>больше половины умерли в следующие десять лет</b>.",
+      "answer": [
+        "Проклятия не было. Из 58 человек, видевших вскрытие гробницы и саркофага, за 12 лет умерли лишь восемь, а Говард Картер прожил ещё 16 лет.",
+        "Лорд Карнарвон умер от заражения крови: порезал при бритье укус комара. Остальное сделали газеты, а репортёры даже выдумали надпись с проклятием в гробнице."
+      ],
+      "source": "Википедия, «Curse of the pharaohs»; BMJ, 21.12.2002"
+    },
+    "en": {
+      "title": "The Price of a Find",
+      "story": "The pharaoh’s curse was real. In 1923, less than two months after Tutankhamun’s burial chamber was opened, the lord who had paid for the dig died. And of those present when the tomb and sarcophagus were opened, <b>more than half died within ten years</b>.",
+      "answer": [
+        "There was no curse. Of the 58 people present when the tomb and sarcophagus were opened, only eight died within 12 years, and Howard Carter lived 16 more.",
+        "Lord Carnarvon died of blood poisoning after nicking a mosquito bite while shaving. The papers did the rest, and reporters even invented a curse inscribed in the tomb."
+      ],
+      "source": "Wikipedia, “Curse of the pharaohs”; BMJ, 21 Dec 2002"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-ghostclause.jpg",
+    "cat": "mysteries",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "GB",
+    "year": 1934,
+    "ru": {
+      "title": "Особый пункт",
+      "story": "В 1934 году американский промышленник купил замок в Шотландии вместе с привидением, «Серой леди». Её внесли в купчую отдельным пунктом: если за первый год её никто не увидит, продавец вернёт 500 фунтов. <b>Деньги так и не вернули.</b>",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Сюжет похож на комедию Рене Клера «Призрак едет на Запад» (1935): богач везёт шотландский замок во Флориду, а привидение едет следом.",
+        "А вот суд привидений признал: в 1991 году суд Нью-Йорка решил, что дом в Найаке «по закону населён призраками», и покупателю разрешили расторгнуть сделку."
+      ],
+      "source": "Википедия, «The Ghost Goes West», «Stambovsky v. Ackley»"
+    },
+    "en": {
+      "title": "A Special Clause",
+      "story": "In 1934 an American industrialist bought a Scottish castle complete with its ghost, the Grey Lady. She had her own clause in the deed of sale: if nobody saw her in the first year, the seller would refund £500. <b>The money was never refunded.</b>",
+      "answer": [
+        "<b>This story was made up by our editors.</b> It echoes René Clair’s 1935 comedy “The Ghost Goes West”: a tycoon ships a Scottish castle to Florida, and its ghost follows.",
+        "But one court did take ghosts seriously: in 1991 a New York appeals court ruled a house in Nyack “haunted as a matter of law” and let the buyer cancel the deal."
+      ],
+      "source": "Wikipedia, “The Ghost Goes West”, “Stambovsky v. Ackley”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-crownjewels.jpg",
+    "cat": "mysteries",
+    "pts": 2,
+    "verdict": "true",
+    "country": "IE",
+    "year": 1907,
+    "ru": {
+      "title": "Открытый сейф",
+      "story": "Летом 1907 года посыльный подошёл к сейфу в Дублинском замке и увидел, что тот не заперт. Пропали бриллиантовые звезда и знак ордена Святого Патрика. Замки никто не взламывал, <b>оба ключа были у одного человека</b>, а до визита короля оставалось четыре дня. Драгоценности так и не нашли.",
+      "answer": [
+        "Кражу обнаружили 6 июля 1907 года. Оба ключа хранил главный герольд Ирландии Артур Викарс, а сейф стоял у него в библиотеке: в хранилище он не пролез.",
+        "Пропало больше чем на 30 000 фунтов. Викарса вынудили уйти в отставку, но обвинений никому не предъявили, а поиски в башне в 1983 году ничего не дали."
+      ],
+      "source": "Википедия, «Irish Crown Jewels»; Mental Floss, «The Irish Crown Jewels theft»"
+    },
+    "en": {
+      "title": "The Open Safe",
+      "story": "In the summer of 1907 a messenger went to a safe in Dublin Castle and found it unlocked. The diamond star and badge of the Order of St Patrick were gone. No lock had been forced, <b>both keys belonged to one man</b>, and the King was due in four days. The jewels have never been found.",
+      "answer": [
+        "The theft was found on 6 July 1907. Both keys belonged to Ireland’s chief herald, Sir Arthur Vicars, and the safe sat in his library: it would not fit into the strongroom.",
+        "Over £30,000 worth was taken. Vicars was forced out, but no one was ever charged, and a 1983 search of the tower’s walls and floors found nothing."
+      ],
+      "source": "Wikipedia, “Irish Crown Jewels”; Mental Floss, “The Irish Crown Jewels theft”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-violinstrings.jpg",
+    "cat": "mysteries",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "IT",
+    "year": 1937,
+    "ru": {
+      "title": "Без обратного адреса",
+      "story": "С 1937 по 1967 год каждое 27 октября, в день рождения великого скрипача, мэрия Генуи получала конверт без обратного адреса. В нём лежали новые струны для скрипки, которую музыкант завещал городу. Конверты пришли <b>из 31 страны</b>, ни одна не повторилась. Отправителя так и не нашли.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Скрипка настоящая: «Пушку» сделал Гварнери дель Джезу в 1743 году. Паганини завещал её Генуе, и она хранится в ратуше.",
+        "И двойник у неё правда есть: парижский мастер Жан-Батист Вийом сделал копию так точно, что Паганини отличил оригинал лишь по звуку. Обе скрипки теперь в Генуе."
+      ],
+      "source": "Википедия, «Il Cannone Guarnerius»; Musei di Genova"
+    },
+    "en": {
+      "title": "No Return Address",
+      "story": "From 1937 to 1967, every 27 October, the great violinist’s birthday, Genoa’s town hall received an envelope with no return address. Inside were new strings for the violin he had left to the city. The 31 envelopes came from <b>31 different countries</b>. The sender was never found.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> The violin is real: “Il Cannone”, made by Guarneri del Gesù in 1743. Paganini left it to Genoa, and it is kept in the town hall.",
+        "It really does have a twin: Paris luthier Jean-Baptiste Vuillaume copied it so exactly that Paganini could tell the original only by its tone. Both are now in Genoa."
+      ],
+      "source": "Wikipedia, “Il Cannone Guarnerius”; Musei di Genova"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-greatseal.jpg",
+    "cat": "war",
+    "pts": 2,
+    "verdict": "true",
+    "country": "RU",
+    "year": 1945,
+    "ru": {
+      "title": "Подарок с ушами",
+      "story": "В 1945 году советские пионеры подарили послу США резной деревянный герб с орлом. Его повесили в резиденции посла, и семь лет он слушал все разговоры. Внутри был жучок <b>без батареек и проводов</b>: он оживал, только когда снаружи на него направляли радиолуч.",
+      "answer": [
+        "Герб вручили послу Авереллу Гарриману 4 августа 1945 года. Он висел в Спасо-хаусе до 1952 года, пока техник Госдепартамента не нашёл в нём жучок.",
+        "Устройство «Златоуст» придумал Лев Термен, создатель терменвокса. Внутри были только мембрана и антенна: радиоволна извне отражалась от них уже с голосами из комнаты."
+      ],
+      "source": "Википедия, «The Thing (listening device)»; Crypto Museum"
+    },
+    "en": {
+      "title": "A Gift with Ears",
+      "story": "In 1945 Soviet schoolchildren gave the US ambassador a carved wooden Great Seal of the United States. It hung in his residence and for seven years heard every word. Inside was a bug <b>with no batteries and no wires</b>: it came alive only when a radio beam was aimed at it from outside.",
+      "answer": [
+        "Young Pioneers presented it to Ambassador Averell Harriman on 4 August 1945. It hung at Spaso House until 1952, when a State Department technician found the bug.",
+        "“The Thing” was designed by Leon Theremin, inventor of the theremin. It held only a membrane and an antenna: a radio wave from outside bounced back carrying voices."
+      ],
+      "source": "Wikipedia, “The Thing (listening device)”; Crypto Museum"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-churchmaps.jpg",
+    "cat": "war",
+    "pts": 3,
+    "verdict": "fake",
+    "country": "GB",
+    "year": 1940,
+    "ru": {
+      "title": "Ориентир по шпилю",
+      "story": "Летом 1940 года, ожидая немецкий десант, британская картографическая служба перепечатала карты Англии с подвохом: все церкви на них <b>сдвинули на 400 метров</b>. По колокольням парашютисты искали бы дорогу. Честные карты выдавали только армии, а подделки свободно продавались в магазинах.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Но к вторжению Британия правда готовилась: сняла дорожные указатели и таблички станций и запретила продавать подробные карты.",
+        "Двигать церкви было незачем: у немцев уже были британские карты. А вот после войны на фотопланах 1947 года аэродромы правда закрашивали под поля."
+      ],
+      "source": "Википедия, «British anti-invasion preparations of the Second World War»; Bodleian Library, «Dude, where’s my airfield?»"
+    },
+    "en": {
+      "title": "Steering by Spires",
+      "story": "In the summer of 1940, bracing for German paratroopers, Britain’s Ordnance Survey reprinted its maps with a catch: every church was <b>moved 400 metres</b>. Paratroopers would steer by church towers. Only the army got honest maps, while the doctored ones were sold freely in shops.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> But Britain really did brace for invasion: it took down signposts and station signs and banned the sale of detailed maps.",
+        "Moving churches would have been pointless: the Germans already had British maps. But on 1947 air-photo maps, airfields really were painted over as fields."
+      ],
+      "source": "Wikipedia, “British anti-invasion preparations of the Second World War”; Bodleian Library, “Dude, where’s my airfield?”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-koepenick.jpg",
+    "cat": "law",
+    "pts": 2,
+    "verdict": "true",
+    "country": "DE",
+    "year": 1906,
+    "ru": {
+      "title": "Сила мундира",
+      "story": "В 1906 году безработный сапожник по частям скупил в разных лавках поношенную форму капитана. Он остановил на улице солдат, отвёз их в городок под Берлином, занял ратушу, арестовал бургомистра и забрал городскую кассу. Казначею он <b>выдал расписку</b>.",
+      "answer": [
+        "Это Вильгельм Фойгт, бывший арестант. В 1906 году он остановил гренадеров, добавил солдат со стрельбища и занял ратушу Кёпеника, а расписку подписал именем бывшего тюремщика.",
+        "Фойгт получил 4 года, но немцы смеялись вместе с ним, и в 1908 году кайзер его помиловал. Музей мадам Тюссо сделал его восковую фигуру."
+      ],
+      "source": "Википедия, «Wilhelm Voigt»"
+    },
+    "en": {
+      "title": "The Power of a Uniform",
+      "story": "In 1906 an unemployed shoemaker bought a worn captain’s uniform piece by piece in different shops. He stopped a squad of soldiers in the street, took them to a town outside Berlin, occupied the town hall, arrested the mayor and seized the treasury. He even <b>gave the treasurer a receipt</b>.",
+      "answer": [
+        "This was Wilhelm Voigt, an ex-convict. In 1906 he stopped four grenadiers, added soldiers from a shooting range, seized Köpenick town hall and signed the receipt with his old warden’s name.",
+        "He got four years, but Germans laughed with him, and in 1908 the Kaiser pardoned him. Madame Tussaud’s in London even made his waxwork."
+      ],
+      "source": "Wikipedia, “Wilhelm Voigt”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-crate.jpg",
+    "cat": "law",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "SE",
+    "year": 1962,
+    "ru": {
+      "title": "Ночной экспонат",
+      "story": "В 1962 году вор решил проникнуть в Национальный музей Стокгольма в ящике: его доставили под видом скульптуры для новой выставки. Ночью он собирался вынести рисунки Рембрандта. Утром его нашли в запаснике: ящик поставили <b>вверх дном</b>, и выбраться он не смог.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Но ящик вверх дном был: в 1965 году 19-летний валлиец отправил себя из Австралии в ящике, и тот 22 часа простоял вверх дном.",
+        "А музей в Стокгольме правда грабили: в 2000 году вооружённые люди унесли Рембрандта и двух Ренуаров и уплыли на моторной лодке. К 2005-му картины вернули."
+      ],
+      "source": "Википедия, «Nationalmuseum robbery», «Human mail»"
+    },
+    "en": {
+      "title": "Night Exhibit",
+      "story": "In 1962 a thief tried to get into Stockholm’s Nationalmuseum inside a crate, delivered as a sculpture for a new exhibition. At night he planned to walk out with Rembrandt drawings. In the morning staff found him in the storeroom: the crate had been stood <b>upside down</b>, and he couldn’t get out.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> But an upside-down crate did happen: in 1965 a Welsh 19-year-old posted himself from Australia in a box that sat upside down on the tarmac for 22 hours.",
+        "And Stockholm’s Nationalmuseum really was robbed: in 2000 armed men took a Rembrandt and two Renoirs and fled by motorboat."
+      ],
+      "source": "Wikipedia, “Nationalmuseum robbery”, “Human mail”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-dogvision.jpg",
+    "cat": "animals",
+    "pts": 2,
+    "verdict": "myth",
+    "country": "WORLD",
+    "year": 1937,
+    "ru": {
+      "title": "Глазами пса",
+      "story": "Глаза собаки созданы для сумерек: за сетчаткой у неё зеркальный слой, поэтому ночью они светятся в лучах фар. Но за ночное зрение пришлось заплатить цветом. Мир собака видит <b>чёрно-белым</b>, как старое кино.",
+      "answer": [
+        "Неправда. В сетчатке собаки два типа колбочек, а у человека три. Собаки хорошо различают синий и жёлтый, а красный путают с зелёным, как люди с дальтонизмом.",
+        "Миф пошёл от собаковода Уилла Джуди: в 1937 году он предположил, что собаки видят мир в оттенках чёрного и серого. Это была догадка, а не опыт, но она прижилась."
+      ],
+      "source": "Википедия, «Dog anatomy»; AKC, «Are Dogs Color Blind?»"
+    },
+    "en": {
+      "title": "Dog’s-Eye View",
+      "story": "A dog’s eyes are built for dusk: behind the retina lies a mirror-like layer, which is why they glow in car headlights at night. But night vision came at a price, and the price was colour. A dog sees the world in <b>black and white</b>, like an old film.",
+      "answer": [
+        "Not true. A dog’s retina has two types of cone cells, ours has three. Dogs tell blue from yellow well but mix up red and green, like people with colour blindness.",
+        "The myth goes back to dog writer Will Judy, who suggested in 1937 that dogs probably see the world in shades of black and grey. It was a guess, not an experiment, but it stuck."
+      ],
+      "source": "Wikipedia, “Dog anatomy”; AKC, “Are Dogs Color Blind?”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-owney.jpg",
+    "cat": "animals",
+    "pts": 3,
+    "verdict": "true",
+    "country": "US",
+    "year": 1895,
+    "ru": {
+      "title": "Звон жетонов",
+      "story": "В 1895 году беспородный терьер без хозяина <b>обогнул земной шар</b>: Япония, Китай, Сингапур, Суэц, Азорские острова. Он плыл на почтовых пароходах и ехал в почтовых вагонах, спал на мешках с письмами, а в портах ему вешали на ошейник жетоны и медали.",
+      "answer": [
+        "Это Оуни, талисман почтовой службы США. Он жил при почте в Олбани, спал на мешках и ездил с ними в вагонах, а в 1895 году отправился из Такомы в кругосветку.",
+        "Жетонов набралось столько, что ему сшили курточку. За жизнь он проехал больше 225 000 км, а его чучело стоит в Национальном почтовом музее."
+      ],
+      "source": "Википедия, «Owney (dog)»"
+    },
+    "en": {
+      "title": "Jingling Tags",
+      "story": "In 1895 a mongrel terrier with no owner <b>travelled around the world</b>: Japan, China, Singapore, Suez, the Azores. He sailed on mail steamers and rode in mail cars, slept on sacks of letters, and in port after port people hung new tags and medals on his collar.",
+      "answer": [
+        "This was Owney, mascot of the US Railway Mail Service. He lived at the Albany post office, rode with the mail bags on trains, and in 1895 set off from Tacoma around the world.",
+        "He collected so many tags that he was given a little jacket for them. He travelled over 225,000 km, and his preserved body is now at the National Postal Museum."
+      ],
+      "source": "Wikipedia, “Owney (dog)”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-penguin.jpg",
+    "cat": "animals",
+    "pts": 2,
+    "verdict": "true",
+    "country": "NO",
+    "year": 2008,
+    "ru": {
+      "title": "Высокий чин",
+      "story": "В 2008 году в шотландском зоопарке выстроились 130 гвардейцев норвежского короля. Зачитали королевскую грамоту, мечом коснулись плеч нового рыцаря, и он обошёл строй. Рыцарем стал <b>пингвин</b>, к тому времени уже почётный шеф гвардейского полка.",
+      "answer": [
+        "Это Нильс Олав, королевский пингвин из Эдинбургского зоопарка. Норвежская гвардия взяла его в талисманы в 1972 году и с каждым визитом повышала в звании.",
+        "Рыцарство одобрил король Норвегии Харальд V. Имя и звания переходят от пингвина к пингвину: Нильс Олав III в 2023 году стал генерал-майором."
+      ],
+      "source": "Википедия, «Nils Olav»"
+    },
+    "en": {
+      "title": "Top Brass",
+      "story": "In 2008, 130 soldiers of the Norwegian King’s Guard lined up at a Scottish zoo. A citation from the King was read out, a sword touched the new knight on both shoulders, and he inspected the ranks. The knight was <b>a penguin</b>, already the regiment’s colonel-in-chief.",
+      "answer": [
+        "This is Nils Olav, a king penguin at Edinburgh Zoo. The Norwegian King’s Guard adopted him as its mascot in 1972 and promoted him on every visit.",
+        "King Harald V of Norway approved the knighthood. The name and ranks pass from penguin to penguin: Nils Olav III became a major general in 2023."
+      ],
+      "source": "Wikipedia, “Nils Olav”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-lemmings.jpg",
+    "cat": "animals",
+    "pts": 1,
+    "verdict": "myth",
+    "country": "WORLD",
+    "year": 1958,
+    "ru": {
+      "title": "Закон природы",
+      "story": "Примерно раз в четыре года лемминги размножаются так, что тундре их уже не прокормить. Тогда тысячи зверьков сбиваются в огромные стаи, бегут к морю и <b>бросаются с обрыва</b>. Так природа сама сокращает их число.",
+      "answer": [
+        "Лемминги не кончают с собой. В годы бума они расходятся в поисках еды и переплывают реки. Часть тонет или срывается с берегов, но это несчастные случаи.",
+        "Знаменитым миф сделал фильм Диснея «Белая пустошь» (1958). В начале 1980-х канадское телевидение выяснило, что леммингов сбрасывала с обрыва сама съёмочная группа."
+      ],
+      "source": "Википедия, «Lemming», «White Wilderness (film)»"
+    },
+    "en": {
+      "title": "Law of Nature",
+      "story": "Roughly every four years lemmings breed so fast that the tundra can no longer feed them. Then thousands gather in huge swarms, run to the sea and <b>throw themselves off the cliffs</b>. It is nature’s own way of cutting their numbers.",
+      "answer": [
+        "Lemmings do not commit suicide. In boom years they scatter in search of food and swim across rivers. Some drown or fall from steep banks, but these are accidents.",
+        "Disney’s 1958 film <i>White Wilderness</i> made the myth famous. In the early 1980s Canadian TV revealed that the film crew had pushed the lemmings off the cliff themselves."
+      ],
+      "source": "Wikipedia, “Lemming”, “White Wilderness (film)”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-platypus.jpg",
+    "cat": "animals",
+    "pts": 2,
+    "verdict": "true",
+    "country": "GB",
+    "year": 1799,
+    "ru": {
+      "title": "Подозрительная посылка",
+      "story": "В 1799 году лондонский зоолог разглядывал шкурку зверя, присланную из Австралии: густой мех, плоский хвост, перепонки на лапах и утиный клюв. Учёный заподозрил розыгрыш и <b>взял ножницы</b>: искал швы, которыми клюв пришили к шкуре.",
+      "answer": [
+        "Это утконос, а зоолог Джордж Шоу из Британского музея. В первом научном описании 1799 года он признался, что клюв невольно наводит на мысль о подделке.",
+        "Швов не нашлось, и Шоу описал новый вид. Позже выяснилось, что утконос ещё и откладывает яйца, а у самцов ядовитые шпоры."
+      ],
+      "source": "Википедия, «Platypus»"
+    },
+    "en": {
+      "title": "A Suspicious Parcel",
+      "story": "In 1799 a London zoologist examined the skin of an animal sent from Australia: thick fur, a flat tail, webbed feet and a duck’s bill. Suspecting a hoax, he <b>picked up a pair of scissors</b> to look for the stitches holding the bill to the skin.",
+      "answer": [
+        "The animal was a platypus, the zoologist George Shaw of the British Museum. In the first scientific description, in 1799, Shaw admitted the bill naturally suggested a fake.",
+        "There were no stitches, and Shaw described a new species. Later it turned out that the platypus lays eggs and males have venomous spurs."
+      ],
+      "source": "Wikipedia, “Platypus”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-canary.jpg",
+    "cat": "geography",
+    "pts": 3,
+    "verdict": "fake",
+    "country": "US",
+    "year": 1934,
+    "ru": {
+      "title": "Живой датчик",
+      "story": "В 1934 году двое американцев опустились в океан у Бермудских островов на рекордные 923 м в стальном шаре шириной 1,45 м. С собой они взяли <b>канарейку в клетке</b>: если птица перестанет петь, значит, воздух в шаре портится и пора наверх.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Канарейки в батисфере не было. Кислород давали баллоны, а углекислый газ и влагу поглощали лотки с химикатами.",
+        "Сам спуск настоящий: в 1934 году Уильям Биб и Отис Бартон опустились в батисфере на 923 м и через кварцевые иллюминаторы разглядывали светящихся рыб."
+      ],
+      "source": "Википедия, «Bathysphere»"
+    },
+    "en": {
+      "title": "Living Sensor",
+      "story": "In 1934 two Americans descended off Bermuda to a record 923 m inside a steel ball just 1.45 m across. They took <b>a canary in a cage</b> with them: if the bird stopped singing, the air in the sphere was going bad and it was time to go up.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> There was no canary in the Bathysphere. Oxygen came from cylinders, and trays of chemicals absorbed carbon dioxide and moisture.",
+        "The dive itself is real: in 1934 William Beebe and Otis Barton reached 923 m in the Bathysphere and watched glowing fish through quartz windows."
+      ],
+      "source": "Wikipedia, “Bathysphere”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-snowflake.jpg",
+    "cat": "geography",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "CH",
+    "year": 1946,
+    "ru": {
+      "title": "Слепок зимы",
+      "story": "С 1946 года исследователи снега в лаборатории на горе над Давосом хранят <b>по снежинке от каждой зимы</b>. Первую ровную шестилучевую снежинку сезона ловят на охлаждённое стекло и покрывают каплей смолы: лёд испаряется, а точный слепок остаётся. Их уже 80.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Такой коллекции в Давосе нет. Но способ настоящий: в 1940 году химик Винсент Шефер научился покрывать снежинки раствором пластика.",
+        "Лёд испаряется, а прозрачный слепок можно годами изучать под микроскопом. И лаборатория была: в 1936 году над Давосом открыли лабораторию холода."
+      ],
+      "source": "Википедия, «Vincent Schaefer»; SLF, «Measuring snow in Davos»"
+    },
+    "en": {
+      "title": "Winter’s Cast",
+      "story": "Since 1946 snow researchers at a mountain laboratory above Davos have kept <b>one snowflake from every winter</b>. The first perfect six-pointed flake of the season is caught on a chilled glass slide and covered with a drop of resin: the ice evaporates, leaving an exact cast. There are 80 so far.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> There is no such collection in Davos. But the method is real: in 1940 chemist Vincent Schaefer learned to coat snowflakes in a plastic solution.",
+        "The ice evaporates, and the clear cast can be studied under a microscope for years. And in 1936 a cold lab really did open above Davos."
+      ],
+      "source": "Wikipedia, “Vincent Schaefer”; SLF, “Measuring snow in Davos”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-sandy.jpg",
+    "cat": "geography",
+    "pts": 2,
+    "verdict": "true",
+    "country": "AU",
+    "year": 2012,
+    "ru": {
+      "title": "Точка на карте",
+      "story": "Больше ста лет на картах Кораллового моря между Австралией и Новой Каледонией был остров длиной 25 км. Его рисовали в атласах и показывали спутниковые карты в интернете. В 2012 году австралийские учёные приплыли к нему и нашли <b>открытый океан</b> глубиной больше 1300 м.",
+      "answer": [
+        "Это остров Сэнди. Скорее всего, его «открыли» китобои в 1876 году: возможно, они приняли за сушу плавучую пемзу. Потом остров остался в цифровой базе береговых линий.",
+        "В 2012 году исследовательское судно прошло через это место: глубина нигде не была меньше 1300 м. Через несколько дней остров исчез из онлайн-карт."
+      ],
+      "source": "Википедия, «Sandy Island, New Caledonia»"
+    },
+    "en": {
+      "title": "On the Map",
+      "story": "For more than a century, maps of the Coral Sea between Australia and New Caledonia showed an island 25 km long. Atlases drew it, and online satellite maps showed it too. In 2012 Australian scientists sailed there and found <b>open ocean</b> more than 1,300 m deep.",
+      "answer": [
+        "This was Sandy Island. It was probably ‘discovered’ by a whaler in 1876, whose crew may have mistaken floating pumice for land. It survived in a digital coastline database.",
+        "In 2012 a research vessel sailed through the spot: the seabed was never shallower than 1,300 m. Within days the island vanished from online maps."
+      ],
+      "source": "Wikipedia, “Sandy Island, New Caledonia”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-tonguemap.jpg",
+    "cat": "body",
+    "pts": 2,
+    "verdict": "myth",
+    "country": "DE",
+    "year": 1901,
+    "ru": {
+      "title": "Четыре зоны",
+      "story": "В 1901 году немецкий учёный проверил, как разные участки языка чувствуют вкус. Так появилась знаменитая схема: язык поделён на <b>вкусовые зоны</b>. Сладкое мы чувствуем кончиком, солёное и кислое боками, а горькое только корнем языка.",
+      "answer": [
+        "Неправда: любой участок языка, где есть вкусовые почки, чувствует все вкусы. Давид Хениг нашёл лишь небольшие различия в чувствительности, и в 1974 году это подтвердили.",
+        "Откуда миф: в 1942 году психолог Эдвин Боринг перерисовал графики Хенига, и другие авторы приняли низкие точки кривых за полное отсутствие вкуса."
+      ],
+      "source": "Википедия, «Tongue map»"
+    },
+    "en": {
+      "title": "Four Zones",
+      "story": "In 1901 a German scientist tested how different parts of the tongue sense taste. This gave us the famous diagram: the tongue is divided into <b>taste zones</b>. We sense sweetness with the tip, salt and sour along the sides, and bitterness only at the back.",
+      "answer": [
+        "Not true: every part of the tongue with taste buds can sense every taste. David Hänig found only small differences in sensitivity, and a 1974 study confirmed it.",
+        "Where the myth comes from: in 1942 psychologist Edwin Boring replotted Hänig’s graphs, and later authors read the lowest points of the curves as no taste at all."
+      ],
+      "source": "Wikipedia, “Tongue map”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-cullinan.jpg",
+    "cat": "jewelry",
+    "pts": 2,
+    "verdict": "true",
+    "country": "ZA",
+    "year": 1905,
+    "ru": {
+      "title": "Отвлекающий манёвр",
+      "story": "В 1905 году крупнейший ювелирный алмаз в истории, 3106 карат, отправляли из Южной Африки в Лондон. На пароходе посылку торжественно заперли в капитанском сейфе, и всю дорогу её стерегли сыщики. А настоящий камень ехал <b>обычной заказной почтой</b> в простой коробке.",
+      "answer": [
+        "Это алмаз <b>«Куллинан»</b>, найденный в 1905 году в Трансваале. На пароходе везли подделку, приманку для воров, а настоящий камень пришёл в Лондон заказной посылкой.",
+        "В 1908 году трюк повторили: военный корабль с шумом вёз через Северное море пустую коробку, а огранщик Абрахам Асшер вёз камень в Амстердам в кармане пальто."
+      ],
+      "source": "Википедия, «Cullinan Diamond»"
+    },
+    "en": {
+      "title": "Sleight of Hand",
+      "story": "In 1905 the largest gem diamond ever found, 3,106 carats, was sent from South Africa to London. On a steamer, a parcel was ceremonially locked in the captain’s safe and guarded by detectives all the way. The real stone travelled <b>by ordinary registered post</b> in a plain box.",
+      "answer": [
+        "This was the <b>Cullinan</b>, found in 1905 in the Transvaal. A steamer carried a decoy fake, while the real diamond reached London in a plain box by registered post.",
+        "In 1908 the trick was repeated: a Navy ship showily carried an empty box across the North Sea, while cutter Abraham Asscher took the stone in his coat pocket."
+      ],
+      "source": "Wikipedia, “Cullinan Diamond”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-pearlkeeper.jpg",
+    "cat": "jewelry",
+    "pts": 3,
+    "verdict": "fake",
+    "country": "DK",
+    "year": 1910,
+    "ru": {
+      "title": "Живой блеск",
+      "story": "В подвале копенгагенского замка Розенборг хранится жемчужное ожерелье, которое датские королевы носили с XVII века. Без тепла кожи жемчуг тускнеет, поэтому с 1910 года одна из смотрительниц замка носит его <b>по два часа каждую среду</b>, под форменной блузкой.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Смотрители жемчуг не носят. Но ожерелье настоящее: в 1842 году его жемчужины соединили с рубинами в гарнитур в цветах датского флага.",
+        "Датские коронные драгоценности единственные в мире, которые служат музейными экспонатами и до сих пор надевает королева. Выставлены они в Розенборге."
+      ],
+      "source": "Королевская коллекция Дании, «The Danish Crown Jewels», «The pearl-ruby set»"
+    },
+    "en": {
+      "title": "Living Lustre",
+      "story": "In the vault beneath Copenhagen’s Rosenborg Castle lies a pearl necklace worn by Danish queens since the 1600s. Without the warmth of skin pearls lose their lustre, so since 1910 one of the castle’s keepers has worn it <b>for two hours every Wednesday</b>, under her uniform blouse.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> No keeper wears the royal pearls. The necklace is real, though: in 1842 its pearls were set with rubies in the red and white of the Danish flag.",
+        "Denmark’s crown jewels are the only ones in the world that are both shown in a museum and still worn by the queen. They are on display at Rosenborg."
+      ],
+      "source": "The Royal Danish Collection, “The Danish Crown Jewels”, “The pearl-ruby set”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-atm.jpg",
+    "cat": "money",
+    "pts": 3,
+    "verdict": "true",
+    "country": "GB",
+    "year": 1967,
+    "ru": {
+      "title": "Деньги из стены",
+      "story": "Первый в мире банкомат заработал в Лондоне в 1967 году. Карточек он не принимал: клиент вставлял особый бумажный чек, пропитанный <b>радиоактивным веществом</b>. Автомат улавливал излучение, сверял ПИН-код и выдавал не больше 10 фунтов.",
+      "answer": [
+        "Автомат открыли 27 июня 1967 года у отделения Barclays в Энфилде, первым деньги снял актёр <b>Рег Варни</b>. Чеки к нему метили углеродом-14.",
+        "ПИН-код изобретатель Джон Шеперд-Баррон хотел сделать шестизначным, как свой армейский номер, но жена сказала, что запомнит только четыре цифры."
+      ],
+      "source": "BBC News, «The man who invented the cash machine», 2007; Википедия, «John Shepherd-Barron»"
+    },
+    "en": {
+      "title": "Cash from the Wall",
+      "story": "The world’s first cash machine opened in London in 1967. It took no cards: customers inserted a special paper cheque laced with <b>a radioactive substance</b>. The machine detected the radiation, checked a PIN and paid out no more than £10.",
+      "answer": [
+        "The machine opened on 27 June 1967 at a Barclays branch in Enfield, and actor <b>Reg Varney</b> made the first withdrawal. The cheques were marked with carbon-14.",
+        "Inventor John Shepherd-Barron first wanted a six-digit PIN, like his army number, but his wife said she could only remember four digits."
+      ],
+      "source": "BBC News, “The man who invented the cash machine”, 2007; Wikipedia, “John Shepherd-Barron”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-tulips.jpg",
+    "cat": "money",
+    "pts": 1,
+    "verdict": "myth",
+    "country": "NL",
+    "year": 1637,
+    "ru": {
+      "title": "Цена цветка",
+      "story": "В 1630-х годах голландцы помешались на тюльпанах: за одну луковицу редкого сорта просили больше, чем стоил дом. В феврале 1637 года пузырь лопнул. <b>Тысячи людей разорились</b>, и экономика Голландии рухнула.",
+      "answer": [
+        "Цены на луковицы и правда рухнули в 1637 году. Но историк <b>Энн Голдгар</b> нашла в архивах меньше полудюжины торговцев в денежных бедах, и то не обязательно из-за тюльпанов.",
+        "Миф о всеобщем разорении пошёл от нравоучительных памфлетов тех лет, а прославил его журналист Чарльз Маккей в книге 1841 года."
+      ],
+      "source": "Википедия, «Tulip mania»; Smithsonian Magazine, «There Never Was a Real Tulip Fever»"
+    },
+    "en": {
+      "title": "The Price of a Flower",
+      "story": "In the 1630s the Dutch went mad for tulips: a single bulb of a rare variety could cost more than a house. In February 1637 the bubble burst. <b>Thousands were ruined</b>, and the Dutch economy collapsed.",
+      "answer": [
+        "Bulb prices really did crash in 1637. But historian <b>Anne Goldgar</b> found fewer than half a dozen traders in money trouble in the archives, and not clearly because of tulips.",
+        "The tale of mass ruin grew out of moralising pamphlets of the time and was made famous by journalist Charles Mackay in an 1841 book."
+      ],
+      "source": "Wikipedia, “Tulip mania”; Smithsonian Magazine, “There Never Was a Real Tulip Fever”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-lollipop.jpg",
+    "cat": "money",
+    "pts": 2,
+    "verdict": "true",
+    "country": "ES",
+    "year": 1969,
+    "ru": {
+      "title": "Рисунок за кофе",
+      "story": "В 1969 году логотип для испанских леденцов на палочке нарисовал <b>великий художник-сюрреалист</b>. Он управился меньше чем за час, за чашкой кофе, прямо на газете, и велел помещать рисунок на макушку обёртки, чтобы его всегда было видно целиком.",
+      "answer": [
+        "Это <b>Сальвадор Дали</b> и леденцы Chupa Chups. Основатель марки Энрик Бернат, его друг и земляк-каталонец, позвал художника на кофе посоветоваться.",
+        "Жёлтая ромашка Дали в обновлённом виде до сих пор украшает каждую обёртку. А первая реклама с новым логотипом обещала: «Он круглый и надолго»."
+      ],
+      "source": "Википедия, «Chupa Chups»; Tasting Table; Artnet News"
+    },
+    "en": {
+      "title": "Sketched Over Coffee",
+      "story": "In 1969 the logo for a Spanish lollipop was drawn by <b>a great surrealist painter</b>. He did it in under an hour, over coffee, right on a newspaper, and insisted it go on top of the wrapper so it could always be seen whole.",
+      "answer": [
+        "It was <b>Salvador Dalí</b>, and the lollipops were Chupa Chups. The brand’s founder Enric Bernat, a friend and fellow Catalan, asked him for advice over coffee.",
+        "Dalí’s yellow daisy, updated over the years, still sits on every wrapper. The first campaign with the new logo promised: “It’s round and long-lasting.”"
+      ],
+      "source": "Wikipedia, “Chupa Chups”; Tasting Table; Artnet News"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-roundel.jpg",
+    "cat": "money",
+    "pts": 1,
+    "verdict": "myth",
+    "country": "DE",
+    "year": 1917,
+    "ru": {
+      "title": "Четыре четверти",
+      "story": "Компания BMW начинала в 1916 году с авиационных моторов. Поэтому и её эмблема, зарегистрированная в 1917 году, изображает <b>вращающийся пропеллер на фоне голубого неба</b>: белые лопасти, а между ними синева.",
+      "answer": [
+        "К самолётам эмблема 1917 года отношения не имеет. Бело-голубые четверти взяты из цветов Баварии в обратном порядке: закон запрещал госсимволы в товарных знаках.",
+        "Пропеллер появился в рекламе 1929 года, где эмблему вписали во вращающийся винт. А в 2010 году даже представитель BMW сначала подтвердил легенду."
+      ],
+      "source": "Википедия, «BMW»; The New York Times, «BMW Roundel: Not Born From Planes», 2010"
+    },
+    "en": {
+      "title": "Four Quarters",
+      "story": "BMW started out in 1916 making aircraft engines. That is why its emblem, registered in 1917, shows <b>a spinning propeller against a blue sky</b>: white blades with patches of blue sky between them.",
+      "answer": [
+        "The 1917 emblem has nothing to do with aircraft. Its blue and white quarters come from the colours of Bavaria, reversed, because the law banned state symbols in trademarks.",
+        "The propeller came from a 1929 advert showing the emblem in a spinning propeller. In 2010 even a BMW spokesman first confirmed the story to The New York Times."
+      ],
+      "source": "Wikipedia, “BMW”; The New York Times, “BMW Roundel: Not Born From Planes”, 2010"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-nugget.jpg",
+    "cat": "luck",
+    "pts": 2,
+    "verdict": "true",
+    "country": "AU",
+    "year": 1869,
+    "ru": {
+      "title": "Под корнями",
+      "story": "В 1869 году двое старателей в Австралии копали у корней дерева и на глубине всего <b>трёх сантиметров</b> наткнулись на золотой самородок весом больше 70 кг. Весов такого размера не нашлось, и кузнец разбил его на наковальне на три части.",
+      "answer": [
+        "Это самородок <b>Welcome Stranger</b>, самый крупный россыпной самородок в истории. Его нашли в 1869 году корнуольские горняки в штате Виктория.",
+        "Банк выплатил находчикам около 9381 фунта. Самородок переплавили в слитки, а по ценам февраля 2026 года это золото стоило бы около 11,6 млн долларов."
+      ],
+      "source": "Википедия, «Welcome Stranger»; Museums Victoria"
+    },
+    "en": {
+      "title": "Under the Roots",
+      "story": "In 1869 two prospectors in Australia were digging by the roots of a tree and, just <b>3 cm below the surface</b>, struck a gold nugget weighing over 70 kg. No scale was big enough, so a blacksmith broke it into three pieces on an anvil.",
+      "answer": [
+        "It was the <b>Welcome Stranger</b>, the largest alluvial gold nugget ever found. Cornish miners dug it up in 1869 near Moliagul in Victoria.",
+        "The finders were paid about £9,381, and the nugget was melted into ingots. At February 2026 gold prices it would be worth about US$11.6 million."
+      ],
+      "source": "Wikipedia, “Welcome Stranger”; Museums Victoria"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-tramticket.jpg",
+    "cat": "luck",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "AT",
+    "year": 1951,
+    "ru": {
+      "title": "Номер наоборот",
+      "story": "С 1951 по 1972 год в венских трамваях действовало особое правило. Если шестизначный номер билета читался одинаково с обеих сторон, например 274472, кондуктор менял его <b>на бесплатный недельный проездной</b>. Пассажиры проверяли каждый билет, прежде чем выбросить.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Венские трамваи призов не раздавали. Но в СССР счастливым считали билет, где сумма первых трёх цифр равна сумме последних трёх.",
+        "Его хранили на удачу или съедали. Счастливым по этому правилу выходит примерно каждый восемнадцатый билет, а палиндромом лишь один из тысячи."
+      ],
+      "source": "Википедия, «Счастливый билет»; Jordan Russia Center (NYU), «I’ve got a lucky ticket»"
+    },
+    "en": {
+      "title": "Read Both Ways",
+      "story": "From 1951 to 1972 Vienna’s trams had a special rule. If the six-digit number on your ticket read the same both ways, like 274472, the conductor swapped it for <b>a free weekly pass</b>. Passengers checked every ticket before throwing it away.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> Vienna’s trams never gave such prizes. But in the USSR a ticket was lucky if its first three digits added up to the same as the last three.",
+        "People kept it for luck or ate it. By this rule about one ticket in 18 is lucky, while only one in a thousand reads the same both ways."
+      ],
+      "source": "Jordan Russia Center (NYU), “I’ve Got a Lucky Ticket”; Wikipedia (Russian), “Lucky ticket”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-nonstop.jpg",
+    "cat": "records",
+    "pts": 3,
+    "verdict": "true",
+    "country": "US",
+    "year": 1958,
+    "ru": {
+      "title": "Без посадки",
+      "story": "В декабре 1958 года двое пилотов взлетели из Лас-Вегаса на маленьком четырёхместном самолёте и не садились <b>64 дня</b>. Дважды в сутки они снижались над прямой пустынной дорогой и лебёдкой поднимали с мчащегося внизу грузовика шланг с бензином, еду и воду.",
+      "answer": [
+        "Это Роберт Тимм и Джон Кук на <b>Cessna 172</b>. Они продержались в воздухе с декабря 1958 по февраль 1959 года, 64 дня 22 часа, и рекорд не побит до сих пор.",
+        "Чтобы пилоты не сели тайком, судьи на взлёте догнали самолёт на кабриолете и мазнули шины белой краской. Однажды ночью Тимм уснул, и больше часа самолёт вёл автопилот."
+      ],
+      "source": "Википедия, «Cessna 172»; Hackaday, 2021"
+    },
+    "en": {
+      "title": "Non-Stop",
+      "story": "In December 1958 two pilots took off from Las Vegas in a small four-seat plane and did not land for <b>64 days</b>. Twice a day they swooped low over a straight desert road and winched up a fuel hose, food and water from a truck racing below.",
+      "answer": [
+        "They were Robert Timm and John Cook in a <b>Cessna 172</b>. They stayed aloft from December 1958 to February 1959, 64 days 22 hours, and the record still stands.",
+        "To rule out secret landings, officials chased the plane in a convertible and daubed its tyres with white paint. One night Timm fell asleep, and the autopilot flew for over an hour."
+      ],
+      "source": "Wikipedia, “Cessna 172”; Hackaday, 2021"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-airshipmast.jpg",
+    "cat": "architecture",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "US",
+    "year": 1931,
+    "ru": {
+      "title": "Причал в облаках",
+      "story": "В сентябре 1931 года к мачте самого высокого небоскрёба мира в Нью-Йорке впервые пришвартовался пассажирский дирижабль. Двенадцать пассажиров сошли по трапу <b>прямо на балкон 102-го этажа</b>, и через семь минут лифт доставил их на улицу.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Шпиль Эмпайр-стейт-билдинг правда строили как причальную мачту. Но в 1931 году дирижабль ВМС в сильный ветер лишь на миг коснулся её.",
+        "Ни один пассажир так и не сел в дирижабль у мачты. Критик Льюис Мамфорд обозвал её «общественным туалетом для перелётных птиц». Теперь на ней телеантенны."
+      ],
+      "source": "Википедия, «Empire State Building»; Museum of the City of New York"
+    },
+    "en": {
+      "title": "A Pier in the Clouds",
+      "story": "In September 1931 a passenger airship moored for the first time to the mast of the world’s tallest skyscraper in New York. Twelve passengers walked down a gangway <b>straight onto a balcony on the 102nd floor</b>, and seven minutes later a lift had them out on the street.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> The Empire State Building’s spire really was built as an airship mast. But in 1931 a Navy airship only briefly touched it in strong winds.",
+        "No passenger ever boarded an airship there. Critic Lewis Mumford called the mast “a public comfort station for migratory birds”. Today it carries TV antennas."
+      ],
+      "source": "Wikipedia, “Empire State Building”; Museum of the City of New York"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-teabell.jpg",
+    "cat": "drinks",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "GB",
+    "year": 1986,
+    "ru": {
+      "title": "Ровно в одиннадцать",
+      "story": "До реформы 1986 года ровно в 11 утра в торговом зале Лондонской фондовой биржи звонил колокол, и торги замирали <b>на десять минут ради чая</b>. Служители вкатывали тележки с огромными чайниками, а сделку, заключённую в перерыв, считали недействительной.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Ради чая биржа не останавливалась. А родилась она за кофе: маклеров выгнали из Королевской биржи, и они перебрались в кофейню Джонатана.",
+        "В 1698 году маклер Джон Кастейнг начал выпускать там список цен. А перерыв в торгах бывает и сейчас: Токийская биржа уходит на обед с 11:30 до 12:30."
+      ],
+      "source": "Википедия, «London Stock Exchange», «Jonathan’s Coffee-House», «Lloyd’s Coffee House»; Japan Exchange Group"
+    },
+    "en": {
+      "title": "Eleven Sharp",
+      "story": "Until the reforms of 1986, a bell rang on the trading floor of the London Stock Exchange at exactly 11 a.m., and dealing stopped for <b>ten minutes of tea</b>. Attendants wheeled in trolleys with huge teapots, and any deal struck during the break was void.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> The exchange never stopped for tea. It was born over coffee: brokers barred from the Royal Exchange moved to Jonathan’s Coffee House.",
+        "There, in 1698, John Castaing began publishing a price list. And trading breaks still exist: the Tokyo Stock Exchange stops for lunch daily from 11:30 to 12:30."
+      ],
+      "source": "Wikipedia, “London Stock Exchange”, “Jonathan’s Coffee-House”, “Lloyd’s Coffee House”; Japan Exchange Group"
+    }
   }
 ];
 
@@ -1748,7 +3141,7 @@ const I18N = {
     shareHead: d => `True / False · ${d}`, shareTail: (s, b) => `${s} ${s === 1 ? 'point' : 'points'} · streak ${b}`,
     copied: 'Copied', copyManual: 'Selected. Copy it manually', locale: 'en-US',
     story: 'Story', answer: 'Answer', score: 'Score', streak: 'Streak',
-    cats: { food: 'Food', sport: 'Sport', tech: 'Technology', law: 'Law', ads: 'Advertising', cinema: 'Cinema', rulers: 'Rulers', history: 'History', science: 'Science', war: 'War', expedition: 'Expeditions', survival: 'Survival', space: 'Space', nature: 'Nature', culture: 'Culture', music: 'Music' },
+    cats: { literature: 'Literature', language: 'Words', holidays: 'Traditions', fashion: 'Fashion', aviation: 'Aviation', pirates: 'Pirates & the Sea', transport: 'Transport', toys: 'Toys & Games', numbers: 'Numbers', celebs: 'Famous Lives', mysteries: 'Mysteries', animals: 'Animals', geography: 'Earth & Ocean', body: 'Body & Medicine', jewelry: 'Jewels', money: 'Money & Brands', luck: 'Luck', records: 'Records', architecture: 'Architecture', drinks: 'Drinks', food: 'Food', sport: 'Sport', tech: 'Tech & Inventions', law: 'Law & Hoaxes', ads: 'Advertising', cinema: 'Film & TV', rulers: 'Rulers', history: 'History', science: 'Science', war: 'War & Spies', expedition: 'Expeditions', survival: 'Survival', space: 'Space', nature: 'Nature', culture: 'Arts', music: 'Music' },
     reset: 'Start over', resetTitle: 'Start over?', resetNew: 'New deck', resetNewSub: 'Drop this game. Cards you have played stay in the archive.',
     resetAll: 'Reset the archive', resetAllSub: 'Every card becomes new again, score back to zero.', cancel: 'Cancel'
   },
@@ -1767,7 +3160,7 @@ const I18N = {
     shareHead: d => `Верю / не верю · ${d}`, shareTail: (s, b) => `${s} ${plural(s, 'очко', 'очка', 'очков')} · серия ${b}`,
     copied: 'Скопировано', copyManual: 'Выделено. Скопируйте вручную', locale: 'ru-RU',
     story: 'История', answer: 'Ответ', score: 'Очки', streak: 'Серия',
-    cats: { food: 'Еда', sport: 'Спорт', tech: 'Техника', law: 'Законы', ads: 'Реклама', cinema: 'Кино', rulers: 'Правители', history: 'История', science: 'Наука', war: 'Война', expedition: 'Экспедиции', survival: 'Выживание', space: 'Космос', nature: 'Природа', culture: 'Культура', music: 'Музыка' },
+    cats: { literature: 'Литература', language: 'Язык и слова', holidays: 'Традиции', fashion: 'Мода', aviation: 'Авиация', pirates: 'Пираты и море', transport: 'Транспорт', toys: 'Игрушки и игры', numbers: 'Числа', celebs: 'ЖЗЛ и селебрити', mysteries: 'Тайны и мистика', animals: 'Животные', geography: 'Земля и океан', body: 'Тело и медицина', jewelry: 'Ювелирка', money: 'Деньги и бренды', luck: 'Удача', records: 'Рекорды', architecture: 'Архитектура', drinks: 'Напитки', food: 'Еда', sport: 'Спорт', tech: 'Техника и изобретения', law: 'Законы и аферы', ads: 'Реклама', cinema: 'Кино и ТВ', rulers: 'Правители', history: 'История', science: 'Наука', war: 'Война и разведка', expedition: 'Экспедиции', survival: 'Выживание', space: 'Космос', nature: 'Природа', culture: 'Искусство', music: 'Музыка' },
     reset: 'Начать заново', resetTitle: 'Начать заново?', resetNew: 'Новая колода', resetNewSub: 'Бросить эту игру. Сыгранные карты останутся в архиве.',
     resetAll: 'Сбросить архив', resetAllSub: 'Все карты снова станут новыми, очки обнулятся.', cancel: 'Отмена'
   }
@@ -1871,6 +3264,11 @@ const FLAGS = {
   CN: ['0 0 30 20', '<rect width="30" height="20" fill="#DE2910"/><polygon fill="#FFDE00" points="5.00,2.00 5.67,4.07 7.85,4.07 6.09,5.35 6.76,7.43 5.00,6.15 3.24,7.43 3.91,5.35 2.15,4.07 4.33,4.07"/><polygon fill="#FFDE00" points="10.39,1.08 10.33,1.80 11.00,2.09 10.29,2.25 10.22,2.97 9.85,2.35 9.14,2.52 9.62,1.97 9.25,1.34 9.91,1.63"/><polygon fill="#FFDE00" points="12.71,3.29 12.38,3.94 12.89,4.45 12.17,4.34 11.84,4.99 11.73,4.27 11.01,4.16 11.66,3.83 11.55,3.11 12.06,3.62"/><polygon fill="#FFDE00" points="12.94,6.66 12.37,7.11 12.62,7.79 12.01,7.38 11.44,7.83 11.64,7.13 11.04,6.72 11.76,6.70 11.97,6.00 12.21,6.68"/><polygon fill="#FFDE00" points="10.34,8.06 10.32,8.79 11.00,9.03 10.30,9.24 10.28,9.96 9.87,9.36 9.17,9.56 9.62,8.99 9.21,8.38 9.89,8.63"/>'],                                                    // 3:2
   CH: ['0 0 20 20', '<rect width="20" height="20" fill="#DA291C"/><rect x="8.1" y="4" width="3.8" height="12" fill="#fff"/><rect x="4" y="8.1" width="12" height="3.8" fill="#fff"/>'], // 1:1
   IS: ['0 0 25 18', '<rect width="25" height="18" fill="#02529C"/><rect x="7" width="4" height="18" fill="#fff"/><rect y="7" width="25" height="4" fill="#fff"/><rect x="8" width="2" height="18" fill="#DC1E35"/><rect y="8" width="25" height="2" fill="#DC1E35"/>'], // 25:18
+  NL: ['0 0 9 6', '<rect width="9" height="6" fill="#21468B"/><rect width="9" height="4" fill="#fff"/><rect width="9" height="2" fill="#AE1C28"/>'], // 3:2
+  MX: ['0 0 7 4', '<rect width="7" height="4" fill="#CE1126"/><rect width="4.67" height="4" fill="#fff"/><rect width="2.33" height="4" fill="#006847"/><circle cx="3.5" cy="2" r="0.6" fill="#8C5B2E"/>'], // 7:4
+  IE: ['0 0 20 10', '<rect width="20" height="10" fill="#FF883E"/><rect width="13.34" height="10" fill="#fff"/><rect width="6.67" height="10" fill="#169B62"/>'], // 2:1
+  ZA: ['0 0 3 2', '<rect width="3" height="2" fill="#001489"/><rect width="3" height="1" fill="#E03C31"/><path d="M0 0L1.5 1 0 2" fill="#000"/><path d="M0 0.333H3M0 1.667H3" stroke="#fff" stroke-width="0.2"/><path d="M0 0L1.6 1 0 2M1.6 1H3" stroke="#FFB81C" stroke-width="0" fill="none"/><path d="M-0.1 0.1L1.45 1-0.1 1.9" fill="none" stroke="#007749" stroke-width="0.6"/><path d="M1.45 1H3" stroke="#007749" stroke-width="0.6"/><path d="M0 0.2L1.2 1 0 1.8" fill="#000" stroke="#FFB81C" stroke-width="0.13"/>'], // 3:2
+  DK: ['0 0 37 28', '<rect width="37" height="28" fill="#C8102E"/><rect x="12" width="4" height="28" fill="#fff"/><rect y="12" width="37" height="4" fill="#fff"/>'], // 37:28
   SE: ['0 0 16 10', '<rect width="16" height="10" fill="#006AA7"/><rect x="5" width="2" height="10" fill="#FECC00"/><rect y="4" width="16" height="2" fill="#FECC00"/>'], // 16:10
   FI: ['0 0 18 11', '<rect width="18" height="11" fill="#fff"/><rect x="5" width="3" height="11" fill="#002F6C"/><rect y="4" width="18" height="3" fill="#002F6C"/>'], // 18:11
   IT: ['0 0 3 2', '<rect width="3" height="2" fill="#CE2B37"/><rect width="2" height="2" fill="#F4F5F0"/><rect width="1" height="2" fill="#009246"/>'], // 3:2
@@ -1880,8 +3278,8 @@ const FLAGS = {
   AU: ['0 0 60 30', '<rect width="60" height="30" fill="#012169"/><g transform="scale(.5)">' + UJ + '</g><circle cx="15" cy="22.5" r="3.2" fill="#fff"/><circle cx="45" cy="6" r="1.5" fill="#fff"/><circle cx="51" cy="13" r="1.5" fill="#fff"/><circle cx="39" cy="14" r="1.5" fill="#fff"/><circle cx="45" cy="25" r="1.6" fill="#fff"/><circle cx="48" cy="17.5" r=".9" fill="#fff"/>'], // 2:1
 };
 const COUNTRY = {
-  ru: { RU: 'Россия', FR: 'Франция', AT: 'Австрия', PE: 'Перу', ES: 'Испания', MC: 'Монако', NO: 'Норвегия', PH: 'Филиппины', CA: 'Канада', GB: 'Великобритания', US: 'США', DE: 'Германия', JP: 'Япония', EG: 'Египет', ML: 'Мали', CL: 'Чили', CN: 'Китай', CH: 'Швейцария', IS: 'Исландия', GR: 'Греция', SE: 'Швеция', FI: 'Финляндия', IT: 'Италия', AU: 'Австралия', WORLD: 'Весь мир' },
-  en: { RU: 'Russia', FR: 'France', AT: 'Austria', PE: 'Peru', ES: 'Spain', MC: 'Monaco', NO: 'Norway', PH: 'Philippines', CA: 'Canada', GB: 'United Kingdom', US: 'United States', DE: 'Germany', JP: 'Japan', EG: 'Egypt', ML: 'Mali', CL: 'Chile', CN: 'China', CH: 'Switzerland', IS: 'Iceland', GR: 'Greece', SE: 'Sweden', FI: 'Finland', IT: 'Italy', AU: 'Australia', WORLD: 'Worldwide' }
+  ru: { RU: 'Россия', FR: 'Франция', AT: 'Австрия', PE: 'Перу', ES: 'Испания', MC: 'Монако', NO: 'Норвегия', PH: 'Филиппины', CA: 'Канада', GB: 'Великобритания', US: 'США', DE: 'Германия', JP: 'Япония', EG: 'Египет', ML: 'Мали', CL: 'Чили', CN: 'Китай', CH: 'Швейцария', IS: 'Исландия', DK: 'Дания', ZA: 'ЮАР', IE: 'Ирландия', MX: 'Мексика', NL: 'Нидерланды', GR: 'Греция', SE: 'Швеция', FI: 'Финляндия', IT: 'Италия', AU: 'Австралия', WORLD: 'Весь мир' },
+  en: { RU: 'Russia', FR: 'France', AT: 'Austria', PE: 'Peru', ES: 'Spain', MC: 'Monaco', NO: 'Norway', PH: 'Philippines', CA: 'Canada', GB: 'United Kingdom', US: 'United States', DE: 'Germany', JP: 'Japan', EG: 'Egypt', ML: 'Mali', CL: 'Chile', CN: 'China', CH: 'Switzerland', IS: 'Iceland', DK: 'Denmark', ZA: 'South Africa', IE: 'Ireland', MX: 'Mexico', NL: 'Netherlands', GR: 'Greece', SE: 'Sweden', FI: 'Finland', IT: 'Italy', AU: 'Australia', WORLD: 'Worldwide' }
 };
 function flag(c) {
   const name = COUNTRY[lang][c.country] || '';
@@ -2284,7 +3682,7 @@ const start = data => {
 hot?.ready ? hot.ready(start) : start(hot?.data ?? {});
 </script>
 <script>
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+if ('serviceWorker' in navigator) { const reg = () => navigator.serviceWorker.register('sw.js').catch(() => {}); document.readyState === 'complete' ? reg() : window.addEventListener('load', reg); }
 </script>
 </body>
 </html>
