@@ -72,7 +72,9 @@
 
   /* card stage */
   .stage { position: relative; min-height: 0; perspective: 1400px; }
-  .wrap { position: absolute; inset: 0; touch-action: none; transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .35s; }
+  /* the card has one fixed design size (360x620) and is scaled as a whole to fit the stage, so its layout is identical on every screen */
+  .wrap { position: absolute; left: 50%; top: 50%; width: calc(360px * var(--k, 1)); height: calc(620px * var(--k, 1)); margin: calc(-310px * var(--k, 1)) 0 0 calc(-180px * var(--k, 1)); touch-action: none; transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .35s; }
+  .fit { position: absolute; left: 0; top: 0; width: 360px; height: 620px; transform: scale(var(--k, 1)); transform-origin: 0 0; }
   .wrap.leaving { transform: translateX(-115%) rotate(-10deg); opacity: 0; }
   .wrap.entering { transform: translateX(115%) rotate(10deg); opacity: 0; transition: none; }
   .inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.3,.7,.2,1); }
@@ -89,7 +91,7 @@
   }
   .back { transform: rotateY(180deg); }
 
-  .head { display: flex; gap: 4px; padding: 12px 12px 0; flex: none; }
+  .head { position: relative; display: flex; gap: 4px; padding: 12px 12px 0; flex: none; }
   .num { width: 50px; background: var(--box); color: var(--fg); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; padding-block: 6px; }
   .num small { font: 600 10px var(--display); color: var(--gold); letter-spacing: .1em; }
   .num b { font: 700 24px var(--display); }
@@ -98,12 +100,12 @@
   .title .flag svg { display: block; width: 100%; height: 100%; }
   .title .flag.world { margin-top: 0; width: 24px; height: 24px; border-radius: 50%; box-shadow: none; }
   .title .tl { flex: 1; min-width: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-  .title h2 { margin: 0; font: 700 23px/1.05 var(--display); text-transform: uppercase; text-wrap: balance; }
+  .title h2 { flex: 1; min-width: 0; margin: 0; font: 700 23px/1.05 var(--display); text-transform: uppercase; white-space: nowrap; overflow: hidden; }
   .seal { width: 30px; height: 30px; flex: none; border-radius: 50%; border: 2px solid var(--gold); color: var(--gold); display: flex; align-items: center; justify-content: center; font: 700 17px/1 var(--display); }
 
-  .art { position: relative; flex: 1 1 auto; min-height: 150px; margin: 4px 12px 0; background: #000; }
+  .art { position: relative; flex: none; height: 268px; margin: 4px 12px 0; background: #000; }
   .art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; }
-  .badges { position: absolute; left: 0; right: 0; bottom: -38px; display: flex; justify-content: center; align-items: flex-start; gap: 12px; }
+  .badges { position: absolute; left: 0; right: 0; bottom: -38px; z-index: 1; display: flex; justify-content: center; align-items: flex-start; gap: 12px; }
   .shield { position: relative; width: 84px; height: 72px; }
   /* the shield is a stroked SVG shape: the paper outline is exactly 4px on every edge, slanted ones and the tip included */
   .shield .sh { position: absolute; left: 4px; top: 4px; width: 76px; height: 64px; overflow: visible; }
@@ -116,7 +118,7 @@
   .square div { height: 100%; background: var(--box); display: flex; align-items: center; justify-content: center; }
   .square svg { width: 34px; height: 34px; }
 
-  .story { flex: none; padding: 50px 20px 18px; text-align: center; font-size: 17px; line-height: 1.38; }
+  .story { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; padding: 50px 20px 14px; text-align: center; font-size: 17px; line-height: 1.38; }
   .story p { margin: 0; }
 
   /* swipe stamps on the front */
@@ -4195,6 +4197,426 @@ const DECK = [
       ],
       "source": "Wikipedia, “Corner kick” (Olympic goal); El Gráfico, “Cesáreo Onzari, el inventor del gol olímpico”"
     }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-floatingpig.jpg",
+    "cat": "music",
+    "pts": 2,
+    "verdict": "true",
+    "country": "GB",
+    "year": 1976,
+    "ru": {
+      "title": "Без присмотра",
+      "story": "В декабре 1976 года британская рок-группа снимала обложку альбома: над лондонской электростанцией парила надувная свинья длиной 12 метров. На случай побега наняли стрелка, но <b>на второй день его забыли позвать</b>. Порыв ветра сорвал свинью, и она улетела через воздушные коридоры Хитроу.",
+      "answer": [
+        "Это съёмки обложки альбома Pink Floyd «Animals» у электростанции Баттерси. Свинью сорвало 3 декабря 1976 года, её видели пилоты, в Хитроу отменяли рейсы.",
+        "Вечером она опустилась на ферму в Кенте и напугала коров. Съёмки продолжили, но на обложку свинью вклеили в удачный кадр первого дня."
+      ],
+      "source": "Википедия, «Animals (Pink Floyd album)»"
+    },
+    "en": {
+      "title": "Unattended",
+      "story": "In December 1976 a British rock band was shooting an album cover: a 12-metre inflatable pig floating above a London power station. A marksman was hired in case it broke free, but <b>on the second day nobody called him back</b>. A gust tore the pig loose, and it drifted off across Heathrow’s flight paths.",
+      "answer": [
+        "It was the cover shoot for Pink Floyd’s “Animals” at Battersea Power Station. The pig broke loose on 3 December 1976, pilots spotted it and Heathrow cancelled flights.",
+        "That night it landed on a farm in Kent and scared the cows. Shooting went on, but the pig on the cover was pasted into a better photo from day one."
+      ],
+      "source": "Wikipedia, “Animals (Pink Floyd album)”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-mozartbaby.jpg",
+    "cat": "music",
+    "pts": 2,
+    "verdict": "myth",
+    "country": "US",
+    "year": 1993,
+    "ru": {
+      "title": "Колыбельная",
+      "story": "В 1993 году журнал Nature напечатал открытие американских учёных: <b>10 минут Моцарта делают человека умнее</b>. Родители стали ставить Моцарта младенцам, а в 1998 году губернатор Джорджии предложил дарить каждому новорождённому диск с классикой за счёт штата.",
+      "answer": [
+        "В опыте было 36 студентов. После сонаты Моцарта они чуть лучше решали задачи на пространственное мышление, около 15 минут. Общий IQ не измеряли.",
+        "Пресса превратила это в «Моцарт делает умнее», появились диски для малышей. Повторные опыты эффекта почти не нашли, это подтвердил обзор 39 исследований в 2010 году."
+      ],
+      "source": "Википедия, «Mozart effect»"
+    },
+    "en": {
+      "title": "Lullaby",
+      "story": "In 1993 the journal Nature published a discovery by American researchers: <b>10 minutes of Mozart makes you smarter</b>. Parents began playing Mozart to their babies, and in 1998 the governor of Georgia proposed giving every newborn a CD of classical music at the state’s expense.",
+      "answer": [
+        "The study involved 36 students. After a Mozart sonata they did slightly better on spatial tasks, for about 15 minutes. General IQ was never measured.",
+        "The press turned it into “Mozart makes you smart”, and baby CDs followed. Later studies found almost no effect, as a 2010 review of 39 studies confirmed."
+      ],
+      "source": "Wikipedia, “Mozart effect”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-ringtonekid.jpg",
+    "cat": "music",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "FI",
+    "year": 1993,
+    "ru": {
+      "title": "Позывные",
+      "story": "В 1993 году финский производитель телефонов объявил конкурс среди школьников на мелодию звонка. Победил <b>12-летний мальчик из Тампере</b>, подобравший мотив на игрушечном синтезаторе. Призом стал новый телефон, а мелодия потом прозвучала по всему миру миллиарды раз.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Знаменитый звонок Nokia взят из гитарной пьесы «Большой вальс» испанца Франсиско Тарреги, 1902 год.",
+        "В 1992 году Nokia взяла этот фрагмент для рекламы, с 1994 года он звучал в телефонах. В 2009 году его слышали, по оценкам, 1,8 млрд раз в день."
+      ],
+      "source": "Википедия, «Nokia tune»"
+    },
+    "en": {
+      "title": "Call Sign",
+      "story": "In 1993 a Finnish phone maker held a contest for schoolchildren to write a ringtone. The winner was <b>a 12-year-old boy from Tampere</b> who picked out the tune on a toy keyboard. His prize was a new phone, and his melody went on to ring billions of times around the world.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> Nokia’s famous ringtone comes from “Gran Vals”, a guitar piece written in 1902 by Spain’s Francisco Tárrega.",
+        "Nokia used the phrase in a 1992 advert and put it in its phones in 1994. By 2009 it was estimated to be heard 1.8 billion times a day."
+      ],
+      "source": "Wikipedia, “Nokia tune”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-tvthursday.jpg",
+    "cat": "cinema",
+    "pts": 3,
+    "verdict": "true",
+    "country": "IS",
+    "year": 1987,
+    "ru": {
+      "title": "Выходной",
+      "story": "Больше 20 лет государственное телевидение Исландии <b>ничего не показывало по четвергам</b>: ни одной передачи за весь день. А до 1983 года канал вдобавок замолкал на весь июль. Четверги без телевизора отменили только в 1987 году.",
+      "answer": [
+        "Государственный канал RÚV начал вещание в 1966 году, и по четвергам эфира не было. В июле сотрудники уходили в отпуск, а техники чинили аппаратуру.",
+        "На седьмой день не хватало денег и людей. В 1986 году появился частный канал Stöð 2, и 1 октября 1987 года RÚV впервые показал полную неделю."
+      ],
+      "source": "Википедия, «RÚV (TV channel)»"
+    },
+    "en": {
+      "title": "Day Off",
+      "story": "For over 20 years Iceland’s state television <b>showed nothing at all on Thursdays</b>, not a single programme all day. Until 1983 it also went off the air for the whole of July. TV-free Thursdays only ended in 1987.",
+      "answer": [
+        "The state channel RÚV began broadcasting in 1966 and stayed dark on Thursdays. In July the staff took leave and engineers serviced the equipment.",
+        "A seventh day needed money and staff it did not have. In 1986 the private channel Stöð 2 arrived, and on 1 October 1987 RÚV first aired a full week."
+      ],
+      "source": "Wikipedia, “RÚV (TV channel)”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-matinee.jpg",
+    "cat": "cinema",
+    "pts": 2,
+    "verdict": "true",
+    "country": "IN",
+    "year": 1995,
+    "ru": {
+      "title": "Дневной сеанс",
+      "story": "В октябре 1995 года в Индии вышел романтический фильм. В одном кинотеатре Мумбаи его показывают до сих пор: в 2014 году там отметили <b>1000 недель подряд</b>, а в 2025-м фильму исполнилось 30 лет. Сеанс по-прежнему один в день, билет стоит 40 рупий.",
+      "answer": [
+        "Это «Непохищенная невеста» с Шахрукх Ханом и Каджол в кинотеатре Maratha Mandir. Прежний рекорд был у фильма «Месть и закон»: пять лет в другом зале Мумбаи.",
+        "В 2015 году показы хотели прекратить, но звонки фанатов вернули фильм через несколько дней. Долгий перерыв случился лишь в пандемию 2020 года."
+      ],
+      "source": "Al Jazeera, 2025; Википедия, «Dilwale Dulhania Le Jayenge»"
+    },
+    "en": {
+      "title": "Matinee",
+      "story": "In October 1995 a romantic film opened across India. One Mumbai cinema has been showing it ever since: in 2014 it marked <b>1,000 weeks in a row</b>, and in 2025 the film turned 30, still screened once a day with tickets at 40 rupees.",
+      "answer": [
+        "The film is Dilwale Dulhania Le Jayenge with Shah Rukh Khan and Kajol, at the Maratha Mandir. The old record was Sholay’s: five years at another Mumbai cinema.",
+        "In 2015 the cinema tried to end the run, but fans’ calls brought it back within days. The only long break came with the 2020 pandemic."
+      ],
+      "source": "Al Jazeera, 2025; Wikipedia, “Dilwale Dulhania Le Jayenge”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-vaderline.jpg",
+    "cat": "cinema",
+    "pts": 1,
+    "verdict": "myth",
+    "country": "US",
+    "year": 1980,
+    "ru": {
+      "title": "Семейная тайна",
+      "story": "1980 год, кульминация второй части знаменитой космической саги. Злодей в чёрном шлеме загнал юного героя на край пропасти. Тот кричит, что злодей убил его отца. И звучит фраза, которую потом повторят миллионы: <b>«Люк, я твой отец»</b>.",
+      "answer": [
+        "В фильме «Империя наносит ответный удар» Люк кричит, что Вейдер убил отца, и слышит: «Нет, я твой отец». Даже актёр в костюме на съёмках читал другую реплику.",
+        "Имя добавили зрители: вне сцены без него фраза непонятна. Пересказы закрепили ошибку, и в опросе 2009 года она стала самой неверно цитируемой строкой кино."
+      ],
+      "source": "Википедия, «The Empire Strikes Back»; The Register, 2009"
+    },
+    "en": {
+      "title": "Family Secret",
+      "story": "1980, the climax of the second film in a famous space saga. A villain in a black helmet has the young hero cornered at the edge of a chasm. The hero cries that the villain killed his father. Then comes the line millions will repeat: <b>“Luke, I am your father.”</b>",
+      "answer": [
+        "In The Empire Strikes Back, Luke cries that Vader killed his father and hears: “No, I am your father.” Even the actor in the suit read another line on set.",
+        "Fans added the name: out of context, the line makes no sense without it. Retellings cemented the error, and a 2009 poll named it cinema’s most misquoted line."
+      ],
+      "source": "Wikipedia, “The Empire Strikes Back”; The Register, 2009"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-abba.jpg",
+    "cat": "fashion",
+    "pts": 2,
+    "verdict": "true",
+    "country": "SE",
+    "year": 1974,
+    "ru": {
+      "title": "Блёстки",
+      "story": "Шведский поп-квартет, победивший на «Евровидении» в 1974 году, выступал в атласе, блёстках и сапогах на огромной платформе. Одна из причин была в налогах: <b>шведский закон разрешал списывать костюмы на расходы, только если в них невозможно выйти на улицу</b>.",
+      "answer": [
+        "Правда. Это ABBA. Так сказано в официальной фотокниге группы 2014 года: в те годы сценическую одежду в Швеции списывали с налогов, если её нельзя носить в жизни.",
+        "«Мы выглядели как чокнутые», признал Бьорн Ульвеус. Первые наряды шила сама Анни-Фрид Лингстад, позже их делал художник по костюмам Уве Сандстрём."
+      ],
+      "source": "The Guardian, «Abba admit outrageous outfits were worn to avoid tax»; Википедия, «ABBA»"
+    },
+    "en": {
+      "title": "Sequins",
+      "story": "The Swedish pop quartet that won Eurovision in 1974 performed in satin, sequins and towering platform boots. One reason was tax: <b>Swedish law let them deduct the cost of costumes only if nobody could possibly wear them in the street</b>.",
+      "answer": [
+        "True. The band was ABBA. Their 2014 official photo book explained: Swedish tax law then let them deduct stage clothes that could not be worn every day.",
+        "“We looked like nuts in those years,” admitted Björn Ulvaeus. Anni-Frid Lyngstad sewed the early outfits herself; later costume designer Owe Sandström made them."
+      ],
+      "source": "The Guardian, “Abba admit outrageous outfits were worn to avoid tax”; Wikipedia, “ABBA”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-bannedkicks.jpg",
+    "cat": "fashion",
+    "pts": 3,
+    "verdict": "myth",
+    "country": "US",
+    "year": 1984,
+    "ru": {
+      "title": "Красное и чёрное",
+      "story": "Осенью 1984 года новичок «Чикаго» вышел на площадку в чёрно-красных кроссовках. Лига их запретила: обувь должна быть в основном белой, как у партнёров. Он играл в них дальше, а <b>спонсор с радостью платил штраф 5000 долларов за каждый матч</b>. Так родилась самая знаменитая баскетбольная модель.",
+      "answer": [
+        "Миф. В октябре 1984 года Майкл Джордан надел чёрно-красные Nike Air Ship, и НБА запретила эту расцветку. В чёрно-красных Air Jordan 1 он в официальных матчах не играл.",
+        "Нет и следов штрафов за каждую игру. Легенду создала реклама Nike 1985 года: «НБА выгнала их из игры». Потом Nike годами повторяла эту историю."
+      ],
+      "source": "Yahoo Sports, «The true story of the ‘banned’ Air Jordans»; Sole Collector, «The True Story Behind the Banned Air Jordan»"
+    },
+    "en": {
+      "title": "Red and Black",
+      "story": "In autumn 1984 a Chicago rookie stepped on court in black-and-red sneakers. The league banned them: shoes had to be mostly white and match the team’s. He kept wearing them, and <b>his sponsor happily paid a $5,000 fine for every game</b>. That is how the most famous basketball shoe was born.",
+      "answer": [
+        "Myth. In October 1984 Michael Jordan wore black-and-red Nike Air Ships, and the NBA banned the colourway. He never played an official game in black-and-red Air Jordan 1s.",
+        "Nor is there evidence of a fine for every game. The legend grew from Nike’s 1985 ad, “the NBA threw them out of the game”, and Nike retold it for years."
+      ],
+      "source": "Yahoo Sports, “The true story of the ‘banned’ Air Jordans”; Sole Collector, “The True Story Behind the Banned Air Jordan”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-platformdisco.jpg",
+    "cat": "fashion",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "IT",
+    "year": 1976,
+    "ru": {
+      "title": "На входе",
+      "story": "Летом 1976 года дискотека в Римини бесплатно пускала всех, у кого платформа на обуви не ниже 10 см. Охранник мерил её деревянной линейкой. <b>Напротив входа сапожник открыл ларёк и наращивал подошву за 20 минут</b>, пока очередь стояла у дверей.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Такой дискотеки, линейки и сапожника не было. Правда в обстановке: в 1970-х платформы носили по всей Европе, и мужчины, и женщины.",
+        "В 1972 году Vogue писал из Рима, что все женщины ходят на пробковых подошвах в 10 см. А побережье между Римини и Риччоне до сих пор славится дискотеками."
+      ],
+      "source": "Википедия, «Platform shoe»; Википедия (it), «Discoteca»"
+    },
+    "en": {
+      "title": "At the Door",
+      "story": "In the summer of 1976 a disco in Rimini let in for free anyone whose platform soles were at least 10 cm high. The bouncer checked with a wooden ruler. <b>A cobbler set up a stall across the street and built up soles in 20 minutes</b> while the queue waited at the door.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> There was no such disco, ruler or cobbler. The setting is real: in the 1970s platforms were worn all over Europe by men and women alike.",
+        "In 1972 Vogue reported from Rome that all women were wearing four-inch cork soles. The coast between Rimini and Riccione is still famous for its discos."
+      ],
+      "source": "Wikipedia, “Platform shoe”; Wikipedia (it), “Discoteca”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-xmaschicken.jpg",
+    "cat": "money",
+    "pts": 1,
+    "verdict": "true",
+    "country": "JP",
+    "year": 1974,
+    "ru": {
+      "title": "Праздничный стол",
+      "story": "В 1974 году американская сеть фастфуда запустила в Японии рекламу: жареная курица как рождественский ужин. Своих рождественских традиций у японцев почти не было, и идея прижилась. С тех пор миллионы семей отмечают праздник курицей из ведёрка, а <b>заказ делают за несколько недель</b>.",
+      "answer": [
+        "Правда. Это KFC. Рождественский «праздничный бочонок» в 1970 году придумал Такэси Окавара, управляющий первым японским рестораном. В 1974-м кампания пошла по всей стране.",
+        "На Рождество дневная выручка некоторых ресторанов в 10 раз выше обычной, без предзаказа стоят часами. Статую полковника Сандерса наряжают Сантой."
+      ],
+      "source": "BBC Worklife, «Why Japan celebrates Christmas with KFC»; Википедия, «KFC in Japan»"
+    },
+    "en": {
+      "title": "The Christmas Table",
+      "story": "In 1974 an American fast-food chain launched an ad campaign in Japan selling fried chicken as the Christmas dinner. Christmas had few traditions in Japan, and the idea stuck. Ever since, millions of families have celebrated with a bucket of chicken, <b>ordered weeks in advance</b>.",
+      "answer": [
+        "True. The chain was KFC. Takeshi Okawara, manager of the first KFC in Japan, came up with a Christmas “party barrel” in 1970. In 1974 the campaign went nationwide.",
+        "At Christmas some branches take ten times their usual daily sales; without an order you queue for hours. The Colonel Sanders statues get Santa suits."
+      ],
+      "source": "BBC Worklife, “Why Japan celebrates Christmas with KFC”; Wikipedia, “KFC in Japan”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-novanova.jpg",
+    "cat": "money",
+    "pts": 2,
+    "verdict": "myth",
+    "country": "MX",
+    "year": 1973,
+    "ru": {
+      "title": "Тест-драйв",
+      "story": "В 1973 году американский автогигант начал собирать в Мехико свой компактный седан. Продажи провалились: <b>название модели по-испански звучало как «no va», то есть «не едет»</b>. Машину пришлось срочно переименовать.",
+      "answer": [
+        "Миф. Chevrolet Nova хорошо продавалась в Мексике и Венесуэле, в Венесуэле даже лучше плана. «Nova» и «no va» звучат по-разному, а в Мексике был и бензин Nova.",
+        "Модель не переименовывали: Caribe в Мексике звался Volkswagen Golf. Байку десятилетиями пересказывают учебники маркетинга как пример плохой подготовки."
+      ],
+      "source": "Snopes, «Did the Chevrolet Nova Fail to Sell in Spanish-Speaking Countries?»; Википедия, «Chevrolet Chevy II / Nova»"
+    },
+    "en": {
+      "title": "Test Drive",
+      "story": "In 1973 an American car giant began assembling its compact sedan in Mexico City. Sales flopped: <b>in Spanish the model’s name sounded like “no va”, meaning “it doesn’t go”</b>. The car had to be hastily renamed.",
+      "answer": [
+        "Myth. The Chevrolet Nova sold well in Mexico and Venezuela, beating GM’s forecasts there. “Nova” and “no va” sound different, and Mexico even sold Nova petrol.",
+        "The car was never renamed: the Caribe was Mexico’s name for the Volkswagen Golf. Marketing textbooks have retold the tale for decades as a lesson in poor research."
+      ],
+      "source": "Snopes, “Did the Chevrolet Nova Fail to Sell in Spanish-Speaking Countries?”; Wikipedia, “Chevrolet Chevy II / Nova”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-officeband.jpg",
+    "cat": "money",
+    "pts": 2,
+    "verdict": "fake",
+    "country": "DE",
+    "year": 1983,
+    "ru": {
+      "title": "Без отрыва от работы",
+      "story": "В 1983 году западногерманский производитель жевательной резинки снял рекламу, где синти-поп группу играли его собственные бухгалтеры. Джингл вышел синглом и <b>три недели держался на первом месте в чартах ФРГ</b>. Группа давала концерты по выходным, а в понедельник возвращалась в офис.",
+      "answer": [
+        "<b>Эту историю придумала редакция.</b> Среди хитов №1 в ФРГ 1983 года нет рекламных джинглов, группы бухгалтеров не было. Но реклама правда рождала хиты.",
+        "В 1979 году крикетный джингл, спетый сотрудниками рекламного агентства и студии, две недели был №1 в Австралии. А в 1972-м песня из рекламы Coca-Cola стала №1 в Британии."
+      ],
+      "source": "Википедия, «List of number-one hits of 1983 (Germany)»; Википедия, «C'mon Aussie C'mon»"
+    },
+    "en": {
+      "title": "Day Jobs",
+      "story": "In 1983 a West German chewing-gum maker shot a TV ad in which the synth-pop band was played by its own accountants. The jingle came out as a single and <b>spent three weeks at No. 1 in the West German charts</b>. The band played gigs at weekends and was back at their desks on Monday.",
+      "answer": [
+        "<b>This story was made up by our editors.</b> No ad jingle topped the West German charts in 1983, and there was no band of accountants. But ads really did produce hits.",
+        "In 1979 a cricket jingle sung by ad agency and studio staff spent two weeks at No. 1 in Australia; in 1972 a Coca-Cola ad song topped the UK chart."
+      ],
+      "source": "Wikipedia, “List of number-one hits of 1983 (Germany)”; Wikipedia, “C'mon Aussie C'mon”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": false,
+    "art": "art-invadercoins.jpg",
+    "cat": "tech",
+    "pts": 2,
+    "verdict": "myth",
+    "country": "JP",
+    "year": 1978,
+    "ru": {
+      "title": "Ненасытные автоматы",
+      "story": "В 1978 году японская фирма выпустила игровой автомат: стреляй по рядам наступающих пришельцев. К концу года таких автоматов в Японии было больше 100 000. Игроки скормили им столько монет по 100 иен, что <b>монет стало не хватать по всей стране</b> и Монетному двору пришлось вчетверо нарастить чеканку.",
+      "answer": [
+        "Space Invaders от Taito и правда стал хитом, но дефицита нумизматы не нашли. В 1978 году монет по 100 иен отчеканили даже меньше, чем в 1977-м: 292 млн против 440 млн.",
+        "Монеты из автоматов не пропадали: выручку регулярно сдавали в банк. Слух раздули газеты, а Taito его не опровергала."
+      ],
+      "source": "Википедия, «Space Invaders»; The Numismatist, март 2014"
+    },
+    "en": {
+      "title": "Hungry Machines",
+      "story": "In 1978 a Japanese company released an arcade game: shoot down rows of advancing alien invaders. By the end of the year Japan had more than 100,000 of the machines. Players fed them so many 100-yen coins that <b>the whole country ran short</b>, and the Mint had to quadruple production.",
+      "answer": [
+        "Taito's Space Invaders really was a smash hit, but numismatists found no shortage. Japan minted fewer 100-yen coins in 1978 than in 1977: 292 million against 440 million.",
+        "Coins didn't vanish into the machines: arcade owners kept banking the takings. Newspapers spread the story, and Taito never denied it."
+      ],
+      "source": "Wikipedia, “Space Invaders”; The Numismatist, March 2014"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-etlandfill.jpg",
+    "cat": "toys",
+    "pts": 2,
+    "verdict": "true",
+    "country": "US",
+    "year": 1983,
+    "ru": {
+      "title": "Культурный слой",
+      "story": "В сентябре 1983 года в городок в пустыне Нью-Мексико потянулись фуры со склада компании, выпускавшей видеоигры. На местной свалке картриджи, приставки и компьютеры раздавили, закопали и <b>залили сверху бетоном</b>. Но местные мальчишки успели кое-что откопать раньше.",
+      "answer": [
+        "Это Atari: на свалку Аламогордо ушло 10–20 фур со склада в Эль-Пасо. Среди игр была E.T. по фильму Спилберга, один из главных провалов в истории видеоигр.",
+        "Историю считали легендой, пока в 2014 году свалку не раскопали для фильма. Нашли E.T. и другие игры. Всего, по словам менеджера Atari, закопали 728 тысяч картриджей."
+      ],
+      "source": "Википедия, «Atari video game burial»"
+    },
+    "en": {
+      "title": "Below the Surface",
+      "story": "In September 1983 trucks from a video game company's warehouse rolled into a small town in the New Mexico desert. At the local dump, cartridges, consoles and computers were crushed, buried and <b>sealed under a layer of concrete</b>. But local kids had already dug some of the games out.",
+      "answer": [
+        "It was Atari: 10 to 20 truckloads from its El Paso warehouse. Among them was E.T., a Spielberg film tie-in and one of gaming's biggest flops.",
+        "The story was long called an urban legend. In 2014 the dump was dug up for a documentary, and out came E.T. and other games. An Atari manager put the total at 728,000 cartridges."
+      ],
+      "source": "Wikipedia, “Atari video game burial”"
+    }
+  },
+  {
+    "pos": "center 40%",
+    "isTrue": true,
+    "art": "art-minitel.jpg",
+    "cat": "tech",
+    "pts": 2,
+    "verdict": "true",
+    "country": "FR",
+    "year": 1983,
+    "ru": {
+      "title": "Домашний экран",
+      "story": "В начале 1980-х французская телефонная компания стала раздавать бесплатный прибор: маленький экран с клавиатурой для телефонной линии. Через него французы покупали билеты на поезд, заказывали продукты, платили по счетам и болтали с незнакомцами <b>за десять лет до того, как мир узнал о вебе</b>.",
+      "answer": [
+        "Это Minitel. Государственная PTT раздавала терминалы бесплатно всем, у кого был телефон, в том числе чтобы меньше тратить на печать справочников.",
+        "Услуги открывались по коротким кодам вроде 3615 SNCF. К концу 1999 года сетью пользовались 25 млн французов из 60 млн. Отключили Minitel только 30 июня 2012 года."
+      ],
+      "source": "Википедия, «Minitel»; IEEE Spectrum"
+    },
+    "en": {
+      "title": "Home Screen",
+      "story": "In the early 1980s the French phone company began handing out a free gadget: a small screen with a keyboard that plugged into the phone line. With it, the French booked train tickets, ordered groceries, paid bills and chatted with strangers <b>a decade before the world heard of the Web</b>.",
+      "answer": [
+        "This was Minitel. The state-run PTT gave terminals free to anyone with a phone line, partly to save on printing phone books.",
+        "Services had short codes like 3615 SNCF. By the end of 1999, 25 million of France’s 60 million people used it. Minitel was switched off only on 30 June 2012."
+      ],
+      "source": "Wikipedia, “Minitel”; IEEE Spectrum"
+    }
   }
 ];
 
@@ -4342,6 +4764,7 @@ const FLAGS = {
   CN: ['0 0 30 20', '<rect width="30" height="20" fill="#DE2910"/><polygon fill="#FFDE00" points="5.00,2.00 5.67,4.07 7.85,4.07 6.09,5.35 6.76,7.43 5.00,6.15 3.24,7.43 3.91,5.35 2.15,4.07 4.33,4.07"/><polygon fill="#FFDE00" points="10.39,1.08 10.33,1.80 11.00,2.09 10.29,2.25 10.22,2.97 9.85,2.35 9.14,2.52 9.62,1.97 9.25,1.34 9.91,1.63"/><polygon fill="#FFDE00" points="12.71,3.29 12.38,3.94 12.89,4.45 12.17,4.34 11.84,4.99 11.73,4.27 11.01,4.16 11.66,3.83 11.55,3.11 12.06,3.62"/><polygon fill="#FFDE00" points="12.94,6.66 12.37,7.11 12.62,7.79 12.01,7.38 11.44,7.83 11.64,7.13 11.04,6.72 11.76,6.70 11.97,6.00 12.21,6.68"/><polygon fill="#FFDE00" points="10.34,8.06 10.32,8.79 11.00,9.03 10.30,9.24 10.28,9.96 9.87,9.36 9.17,9.56 9.62,8.99 9.21,8.38 9.89,8.63"/>'],                                                    // 3:2
   CH: ['0 0 20 20', '<rect width="20" height="20" fill="#DA291C"/><rect x="8.1" y="4" width="3.8" height="12" fill="#fff"/><rect x="4" y="8.1" width="12" height="3.8" fill="#fff"/>'], // 1:1
   IS: ['0 0 25 18', '<rect width="25" height="18" fill="#02529C"/><rect x="7" width="4" height="18" fill="#fff"/><rect y="7" width="25" height="4" fill="#fff"/><rect x="8" width="2" height="18" fill="#DC1E35"/><rect y="8" width="25" height="2" fill="#DC1E35"/>'], // 25:18
+  IN: ['0 0 30 20', '<rect width="30" height="20" fill="#138808"/><rect width="30" height="13.33" fill="#fff"/><rect width="30" height="6.67" fill="#FF9933"/><circle cx="15" cy="10" r="2.8" fill="none" stroke="#000080" stroke-width="0.4"/><path d="M15 10L17.60 10.00M15 10L17.51 10.67M15 10L17.25 11.30M15 10L16.84 11.84M15 10L16.30 12.25M15 10L15.67 12.51M15 10L15.00 12.60M15 10L14.33 12.51M15 10L13.70 12.25M15 10L13.16 11.84M15 10L12.75 11.30M15 10L12.49 10.67M15 10L12.40 10.00M15 10L12.49 9.33M15 10L12.75 8.70M15 10L13.16 8.16M15 10L13.70 7.75M15 10L14.33 7.49M15 10L15.00 7.40M15 10L15.67 7.49M15 10L16.30 7.75M15 10L16.84 8.16M15 10L17.25 8.70M15 10L17.51 9.33" stroke="#000080" stroke-width="0.15"/><circle cx="15" cy="10" r="0.5" fill="#000080"/>'], // 3:2
   BE: ['0 0 15 13', '<rect width="15" height="13" fill="#EF3340"/><rect width="10" height="13" fill="#FDDA24"/><rect width="5" height="13" fill="#000"/>'], // 15:13
   HU: ['0 0 6 3', '<rect width="6" height="3" fill="#477050"/><rect width="6" height="2" fill="#fff"/><rect width="6" height="1" fill="#CE2939"/>'], // 2:1
   PA: ['0 0 30 20', '<rect width="30" height="20" fill="#fff"/><rect x="15" width="15" height="10" fill="#DA121A"/><rect y="10" width="15" height="10" fill="#072357"/><polygon points="7.50,2.00 8.17,4.07 10.35,4.07 8.59,5.35 9.26,7.43 7.50,6.15 5.74,7.43 6.41,5.35 4.65,4.07 6.83,4.07" fill="#072357"/><polygon points="22.50,12.00 23.17,14.07 25.35,14.07 23.59,15.35 24.26,17.43 22.50,16.15 20.74,17.43 21.41,15.35 19.65,14.07 21.83,14.07" fill="#DA121A"/>'], // 3:2
@@ -4361,8 +4784,8 @@ const FLAGS = {
   AU: ['0 0 60 30', '<rect width="60" height="30" fill="#012169"/><g transform="scale(.5)">' + UJ + '</g><circle cx="15" cy="22.5" r="3.2" fill="#fff"/><circle cx="45" cy="6" r="1.5" fill="#fff"/><circle cx="51" cy="13" r="1.5" fill="#fff"/><circle cx="39" cy="14" r="1.5" fill="#fff"/><circle cx="45" cy="25" r="1.6" fill="#fff"/><circle cx="48" cy="17.5" r=".9" fill="#fff"/>'], // 2:1
 };
 const COUNTRY = {
-  ru: { RU: 'Россия', FR: 'Франция', AT: 'Австрия', PE: 'Перу', ES: 'Испания', MC: 'Монако', NO: 'Норвегия', PH: 'Филиппины', CA: 'Канада', GB: 'Великобритания', US: 'США', DE: 'Германия', JP: 'Япония', EG: 'Египет', ML: 'Мали', CL: 'Чили', CN: 'Китай', CH: 'Швейцария', IS: 'Исландия', AR: 'Аргентина', LY: 'Ливия', PA: 'Панама', HU: 'Венгрия', BE: 'Бельгия', DK: 'Дания', ZA: 'ЮАР', IE: 'Ирландия', MX: 'Мексика', NL: 'Нидерланды', GR: 'Греция', SE: 'Швеция', FI: 'Финляндия', IT: 'Италия', AU: 'Австралия', WORLD: 'Весь мир' },
-  en: { RU: 'Russia', FR: 'France', AT: 'Austria', PE: 'Peru', ES: 'Spain', MC: 'Monaco', NO: 'Norway', PH: 'Philippines', CA: 'Canada', GB: 'United Kingdom', US: 'United States', DE: 'Germany', JP: 'Japan', EG: 'Egypt', ML: 'Mali', CL: 'Chile', CN: 'China', CH: 'Switzerland', IS: 'Iceland', AR: 'Argentina', LY: 'Libya', PA: 'Panama', HU: 'Hungary', BE: 'Belgium', DK: 'Denmark', ZA: 'South Africa', IE: 'Ireland', MX: 'Mexico', NL: 'Netherlands', GR: 'Greece', SE: 'Sweden', FI: 'Finland', IT: 'Italy', AU: 'Australia', WORLD: 'Worldwide' }
+  ru: { RU: 'Россия', FR: 'Франция', AT: 'Австрия', PE: 'Перу', ES: 'Испания', MC: 'Монако', NO: 'Норвегия', PH: 'Филиппины', CA: 'Канада', GB: 'Великобритания', US: 'США', DE: 'Германия', JP: 'Япония', EG: 'Египет', ML: 'Мали', CL: 'Чили', CN: 'Китай', CH: 'Швейцария', IS: 'Исландия', IN: 'Индия', AR: 'Аргентина', LY: 'Ливия', PA: 'Панама', HU: 'Венгрия', BE: 'Бельгия', DK: 'Дания', ZA: 'ЮАР', IE: 'Ирландия', MX: 'Мексика', NL: 'Нидерланды', GR: 'Греция', SE: 'Швеция', FI: 'Финляндия', IT: 'Италия', AU: 'Австралия', WORLD: 'Весь мир' },
+  en: { RU: 'Russia', FR: 'France', AT: 'Austria', PE: 'Peru', ES: 'Spain', MC: 'Monaco', NO: 'Norway', PH: 'Philippines', CA: 'Canada', GB: 'United Kingdom', US: 'United States', DE: 'Germany', JP: 'Japan', EG: 'Egypt', ML: 'Mali', CL: 'Chile', CN: 'China', CH: 'Switzerland', IS: 'Iceland', IN: 'India', AR: 'Argentina', LY: 'Libya', PA: 'Panama', HU: 'Hungary', BE: 'Belgium', DK: 'Denmark', ZA: 'South Africa', IE: 'Ireland', MX: 'Mexico', NL: 'Netherlands', GR: 'Greece', SE: 'Sweden', FI: 'Finland', IT: 'Italy', AU: 'Australia', WORLD: 'Worldwide' }
 };
 function flag(c) {
   const name = COUNTRY[lang][c.country] || '';
@@ -4374,10 +4797,10 @@ function flag(c) {
   return `<span class="flag" role="img" aria-label="${name}" title="${name}" style="width:${(20 * w / h).toFixed(1)}px"><svg viewBox="${vb}">${body}</svg></span>`;
 }
 
-function head(c, n) {
+function head(c, n, extra = '') {
   return `<div class="head">
     <div class="num"><b>${pad(n)}</b></div>
-    <div class="title"><div class="tl"><h2>${L(c).title}</h2>${flag(c)}</div></div>
+    <div class="title"><div class="tl"><h2>${L(c).title}</h2>${flag(c)}</div></div>${extra}
   </div>`;
 }
 const yearOf = c => typeof c.year === 'object' ? c.year[lang] : c.year;
@@ -4398,7 +4821,7 @@ function renderCard() {
   if (state.phase === 'play') markSeen(c.art);
   const ans = state.answered;
   $('stage').innerHTML = `
-    <div class="wrap${state.bet && ans === null ? ' bet-on' : ''}" id="wrap">
+    <div class="wrap${state.bet && ans === null ? ' bet-on' : ''}" id="wrap"><div class="fit">
       <div class="inner${ans !== null ? ' flipped' : ''}" id="inner">
         <section class="face front" aria-label="${T.story}">
           <div class="vote-stamp yes" id="stYes">${T.stampYes}</div>
@@ -4430,10 +4853,31 @@ function renderCard() {
           </div>
         </section>
       </div>
-    </div>`;
+    </div></div>`;
   if (ans === null) bindSwipe();
   renderChrome();
+  fitCard();
 }
+
+// scale the fixed-size card to the stage, then shrink a long title to one line and a long story to its box
+function fitCard() {
+  const st = $('stage'); if (!st || !$('wrap')) return;
+  const k = Math.min(st.clientWidth / 360, st.clientHeight / 620);
+  document.documentElement.style.setProperty('--k', k.toFixed(4));
+  st.querySelectorAll('.title h2').forEach(h => {
+    h.style.fontSize = ''; let fs = 23;
+    while (h.scrollWidth > h.clientWidth && fs > 15) { fs -= .5; h.style.fontSize = fs + 'px'; }
+  });
+  const box = st.querySelector('.story');
+  if (box) {
+    box.style.fontSize = ''; let fs = 17;
+    const cs = getComputedStyle(box), pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    const need = () => [...box.children].reduce((h, el) => h + el.offsetHeight + parseFloat(getComputedStyle(el).marginBottom), pad);
+    while (need() > box.clientHeight && fs > 14) { fs -= .5; box.style.fontSize = fs + 'px'; }
+  }
+}
+addEventListener('resize', fitCard);
+document.fonts?.ready.then(fitCard);
 
 function renderChrome() {
   const T = t();
