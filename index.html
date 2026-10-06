@@ -103,11 +103,15 @@
   .art { position: relative; flex: 1 1 auto; min-height: 150px; margin: 4px 12px 0; background: #000; }
   .art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; }
   .badges { position: absolute; left: 0; right: 0; bottom: -38px; display: flex; justify-content: center; align-items: flex-start; gap: 12px; }
-  .shield { width: 84px; height: 72px; padding: 4px; background: var(--paper); clip-path: polygon(0 0, 100% 0, 100% 68%, 50% 100%, 0 68%); }
-  .shield div { height: 100%; background: var(--box); color: var(--fg); clip-path: polygon(0 0, 100% 0, 100% 68%, 50% 100%, 0 68%); display: flex; flex-direction: column; align-items: center; padding-top: 9px; }
+  .shield { position: relative; width: 84px; height: 72px; }
+  /* the shield is a stroked SVG shape: the paper outline is exactly 4px on every edge, slanted ones and the tip included */
+  .shield .sh { position: absolute; left: 4px; top: 4px; width: 76px; height: 64px; overflow: visible; }
+  .shield .sh polygon { fill: var(--box); stroke: var(--paper); stroke-width: 8px; stroke-linejoin: miter; stroke-miterlimit: 4; paint-order: stroke; }
+  .shield .sh polygon.edge { fill: none; stroke: rgba(70,62,52,.55); stroke-width: 10px; }
+  .shield div { position: relative; height: 100%; color: var(--fg); display: flex; flex-direction: column; align-items: center; padding-top: 13px; }
   .shield b { font: 700 24px/1 var(--display); font-variant-numeric: tabular-nums; }
   .shield em { font: 600 9px/1 var(--display); font-style: normal; letter-spacing: .16em; color: var(--gold); margin-top: 3px; }
-  .square { width: 64px; height: 64px; padding: 4px; background: var(--paper); margin-top: 2px; }
+  .square { width: 64px; height: 64px; padding: 4px; background: var(--paper); margin-top: 2px; box-shadow: 0 0 0 1px rgba(70,62,52,.55); }
   .square div { height: 100%; background: var(--box); display: flex; align-items: center; justify-content: center; }
   .square svg { width: 34px; height: 34px; }
 
@@ -156,7 +160,7 @@
   .cb-seal { width: 30%; aspect-ratio: 1; border-radius: 50%; border: 3px solid var(--gold); color: var(--gold); display: flex; align-items: center; justify-content: center; font: 700 clamp(34px, 11vw, 56px)/1 var(--display); text-shadow: 0 2px 0 rgba(0,0,0,.35); }
   .start-copy { position: absolute; left: 0; right: 0; bottom: 0; height: 104px; display: grid; align-content: center; gap: 6px; text-align: center; transition: opacity .25s; }
   .start-copy h2 { margin: 0; font: 700 28px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; }
-  .start-copy p { margin: 0 auto; max-width: 32ch; color: var(--muted); font-size: 15px; line-height: 1.4; }
+  .start-copy p { margin: 0 auto; max-width: 32ch; text-wrap: pretty; color: var(--muted); font-size: 15px; line-height: 1.4; }
   .btn:disabled { opacity: .55; cursor: default; }
 
   .pills { display: flex; gap: 6px; align-items: center; }
@@ -184,6 +188,19 @@
   .bet[aria-pressed="true"] { background: var(--gold); color: var(--ground); }
   .bet:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
   .wrap.bet-on .front { box-shadow: 0 0 0 3px var(--gold), 0 18px 40px rgba(0,0,0,.45); }
+  .timer { position: absolute; left: 0; right: 0; top: 0; height: 8px; z-index: 4; background: rgba(43,39,35,.22); }
+  .timer i { display: block; height: 100%; width: 100%; background: var(--gold); }
+  .timer.warn i { background: var(--myth); }
+  .tclock { position: relative; width: 50px; height: 50px; flex: none; display: grid; place-items: center; color: var(--fg); }
+  .tclock svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+  .tclock .track { stroke: #3a352e; }
+  .tclock .ring { stroke: var(--gold); stroke-linecap: round; }
+  .tclock b { position: relative; font: 700 22px/1 var(--display); font-variant-numeric: tabular-nums; }
+  .tclock.warn { color: #ff8a7d; }
+  .tclock.warn .ring { stroke: var(--myth); }
+  .tclock.warn b { animation: tpulse 1s ease-in-out infinite; }
+  @keyframes tpulse { 50% { transform: scale(1.18); } }
+  @media (prefers-reduced-motion: reduce) { .tclock.warn b { animation: none; } }
   .bet-ribbon { position: absolute; right: 22px; top: 70px; z-index: 3; font: 700 12px/1 var(--display); letter-spacing: .12em; color: var(--ground); background: var(--gold); padding: 5px 9px; border-radius: 3px; transform: rotate(4deg); box-shadow: 0 2px 6px rgba(0,0,0,.3); }
   .you small { display: block; margin-top: 3px; font: 500 12px/1.2 var(--body); opacity: .9; }
   .share { display: flex; gap: 4px; justify-content: center; }
@@ -1021,13 +1038,13 @@ const I18N = {
   en: {
     wordmark: 'True <span>/</span> false', year: 'YEAR', century: 'CENTURY',
     pt: n => n === 1 ? 'point' : 'points', PT: n => n === 1 ? 'POINT' : 'POINTS',
-    believe: 'True', doubt: 'False', sure: 'Sure ×2', swipe: '← false · true →',
+    believe: 'True', doubt: 'False', sure: 'Sure ×2', swipe: '← false · true →',
     stampYes: 'True', stampNo: 'False', truth: 'True', myth: 'Myth', fake: 'Made up', frameQ: 'True or false?', what: 'What really happened',
-    said: b => `You said “${b ? 'True' : 'False'}”`, right: g => `: spot on, +${g}`, wrong: ': wrong',
+    timeUp: 'Time’s up', timeLabel: 'Seconds left', said: b => `You said “${b ? 'True' : 'False'}”`, right: g => `: spot on, +${g}`, wrong: ': wrong',
     betLoss: p => `, −${p} for the bet`, xBet: '×2 for the bet', xStreak: '×2 for the streak',
     shuffle: 'Shuffle & start', shuffling: 'Shuffling…', next: 'Next story', results: 'Results',
     share: 'Share', again: 'New deck', daily: 'Your deck',
-    startText: (n, reset) => `${reset ? 'You have seen every card, so the archive starts over. ' : ''}${n} ${n === 1 ? 'story' : 'stories'} you haven’t seen yet. True, myth or made up? Sure of it? Tap “Sure ×2”.`,
+    startText: (n, reset) => `${reset ? 'You have seen every card, so the archive starts over. ' : ''}${n} ${n === 1 ? 'story' : 'stories'} you haven’t seen yet. True, myth or made up? Sure of it? Tap “Sure ×2”.`,
     endMeta: d => `Result · ${d}`, endLine: (s, r, n, b) => `${s === 1 ? 'point' : 'points'} · ${r} of ${n} right · best streak ${b}`,
     endNote: 'Played cards go to the archive. A new deck only has stories you haven’t seen.',
     shareHead: d => `True / False · ${d}`, shareTail: (s, b) => `${s} ${s === 1 ? 'point' : 'points'} · streak ${b}`,
@@ -1040,13 +1057,13 @@ const I18N = {
   ru: {
     wordmark: 'Верю <span>/</span> не верю', year: 'ГОД', century: 'ВЕК',
     pt: n => plural(n, 'очко', 'очка', 'очков'), PT: n => plural(n, 'ОЧКО', 'ОЧКА', 'ОЧКОВ'),
-    believe: 'Верю', doubt: 'Не верю', sure: 'Уверен ×2', swipe: '← не верю · верю →',
+    believe: 'Верю', doubt: 'Не верю', sure: 'Уверен ×2', swipe: '← не верю · верю →',
     stampYes: 'Верю', stampNo: 'Не верю', truth: 'Правда', myth: 'Миф', fake: 'Выдумка', frameQ: 'Правда или выдумка?', what: 'Как было на самом деле',
-    said: b => `Вы сказали «${b ? 'Верю' : 'Не верю'}»`, right: g => `: в точку, +${g}`, wrong: ': мимо',
+    timeUp: 'Время вышло', timeLabel: 'Осталось секунд', said: b => `Вы сказали «${b ? 'Верю' : 'Не верю'}»`, right: g => `: в точку, +${g}`, wrong: ': мимо',
     betLoss: p => `, −${p} за ставку`, xBet: '×2 за ставку', xStreak: '×2 за серию',
     shuffle: 'Перемешать и начать', shuffling: 'Перемешиваем…', next: 'Следующая история', results: 'Итоги',
     share: 'Поделиться', again: 'Новая колода', daily: 'Колода готова',
-    startText: (n, reset) => `${reset ? 'Вы видели все карты, архив начинается заново. ' : ''}${n} ${plural(n, 'история', 'истории', 'историй')}, которых вы ещё не видели. Правда, миф или выдумка? Уверены? Жмите «Уверен ×2».`,
+    startText: (n, reset) => `${reset ? 'Вы видели все карты, архив начинается заново. ' : ''}${n} ${plural(n, 'история', 'истории', 'историй')}, которых вы ещё не видели. Правда, миф или выдумка? Уверены? Жмите «Уверен ×2».`,
     endMeta: d => `Итог · ${d}`, endLine: (s, r, n, b) => `${plural(s, 'очко', 'очка', 'очков')} · угадано ${r} из ${n} · лучшая серия ${b}`,
     endNote: 'Сыгранные карты ушли в архив. В новой колоде будут только истории, которых вы ещё не видели.',
     shareHead: d => `Верю / не верю · ${d}`, shareTail: (s, b) => `${s} ${plural(s, 'очко', 'очка', 'очков')} · серия ${b}`,
@@ -1101,7 +1118,8 @@ function buildDeck() {
   return best;
 }
 
-const fresh = () => ({ phase: 'start', day: DAY_KEY, order: buildDeck(), i: 0, score: 0, results: [], gains: [], bets: [], answered: null, bet: false, streak: 0, best: 0 });
+const TURN_MS = 25000;   // time for one card; running out counts as a wrong answer
+const fresh = () => ({ timeLeft: TURN_MS, phase: 'start', day: DAY_KEY, order: buildDeck(), i: 0, score: 0, results: [], gains: [], bets: [], answered: null, bet: false, streak: 0, best: 0 });
 let state = fresh();
 const cur = () => DECK[state.order[state.i]];
 const catNo = () => state.order[state.i] + 1;
@@ -1164,6 +1182,7 @@ const yearLabel = (c, T) => c.unit ? c.unit[lang] : c.century ? T.century : T.ye
 
 function youLine(c) {
   const i = state.i, ok = state.results[i], g = state.gains[i] ?? 0, bet = state.bets[i], T = t();
+  if (state.answered === 'timeout') return `<div class="you bad">${T.timeUp}${bet ? T.betLoss(ptsTxt(c.pts)) : ''}</div>`;
   if (ok) {
     const why = [bet && T.xBet, (g / c.pts / (bet ? 2 : 1)) === 2 && T.xStreak].filter(Boolean).join(', ');
     return `<div class="you ok">${T.said(state.answered)}${T.right(ptsTxt(g))}${why ? `<small>${why}</small>` : ''}</div>`;
@@ -1180,14 +1199,15 @@ function renderCard() {
         <section class="face front" aria-label="${T.story}">
           <div class="vote-stamp yes" id="stYes">${T.stampYes}</div>
           <div class="vote-stamp no" id="stNo">${T.stampNo}</div>
+          ${ans === null ? `<div class="timer" id="timer" aria-hidden="true"><i id="timerFill" style="width:${(100 * state.timeLeft / TURN_MS).toFixed(1)}%"></i></div>` : ''}
           ${state.bet && ans === null ? `<div class="bet-ribbon">${T.sure}</div>` : ''}
           ${head(c, n)}
           <div class="art">
             <img src="${c.art}" alt="" style="object-position:${c.pos}">
             <div class="badges">
-              <div class="shield"><div><b>${yearOf(c)}</b><em>${yearLabel(c, T)}</em></div></div>
+              <div class="shield"><svg class="sh" viewBox="0 0 76 64" aria-hidden="true"><polygon class="edge" points="0,0 76,0 76,43.5 38,64 0,43.5"/><polygon points="0,0 76,0 76,43.5 38,64 0,43.5"/></svg><div><b>${yearOf(c)}</b><em>${yearLabel(c, T)}</em></div></div>
               <div class="square" role="img" aria-label="${T.cats[c.cat]}" title="${T.cats[c.cat]}"><div>${ICONS[c.cat]}</div></div>
-              <div class="shield"><div><b>+${c.pts}</b><em>${T.PT(c.pts)}</em></div></div>
+              <div class="shield"><svg class="sh" viewBox="0 0 76 64" aria-hidden="true"><polygon class="edge" points="0,0 76,0 76,43.5 38,64 0,43.5"/><polygon points="0,0 76,0 76,43.5 38,64 0,43.5"/></svg><div><b>${c.pts}</b><em>${T.PT(c.pts)}</em></div></div>
             </div>
           </div>
           <div class="story"><div class="frame-q">${T.frameQ}</div><p>${C.story}</p></div>
@@ -1244,7 +1264,8 @@ function renderChrome() {
     $('copy').onclick = copyResult;
     $('again').onclick = () => { state = fresh(); renderStart(); shuffleAndDeal(); };
   } else if (state.answered === null) {
-    hint.innerHTML = `<button class="bet" id="bet" aria-pressed="${state.bet}">${T.sure}</button><span>${T.swipe}</span>`;
+    hint.innerHTML = `<button class="bet" id="bet" aria-pressed="${state.bet}">${T.sure}</button><span class="tclock" id="tclock" role="timer" aria-label="${T.timeLabel}"><svg viewBox="0 0 50 50" fill="none" stroke-width="5" aria-hidden="true"><circle class="track" cx="25" cy="25" r="21"/><circle class="ring" id="tring" cx="25" cy="25" r="21" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"/></svg><b id="tsec">${Math.ceil(state.timeLeft / 1000)}</b></span><span>${T.swipe}</span>`;
+    updateTimer();
     $('bet').onclick = toggleBet;
     btns.innerHTML = `<button class="btn no" id="no">${T.doubt}</button><button class="btn yes" id="yes">${T.believe}</button>`;
     $('no').onclick = () => answer(false);
@@ -1316,15 +1337,38 @@ function answer(believe) {
   state.best = Math.max(state.best, state.streak);
   if (g > 0) { const s = $('score'); s.classList.remove('bump'); void s.offsetWidth; s.classList.add('bump'); }
   try { navigator.vibrate && navigator.vibrate(ok ? 20 : [30, 60, 30]); } catch (e) {}
-  const wrap = $('wrap');
+  const wrap = $('wrap'); if (!wrap) return renderCard();
   wrap.style.transition = ''; wrap.style.transform = '';
   renderCard();
 }
 
+// Turn timer. It keeps running when the app is in the background (no pausing to look the answer up);
+// it stops only while the start-over sheet is open.
+function updateTimer() {
+  const f = $('timerFill'), sec = $('tsec'), clock = $('tclock'), bar = $('timer');
+  const left = Math.max(0, state.timeLeft), warn = left <= 5000;
+  if (f) f.style.width = (100 * left / TURN_MS).toFixed(1) + '%';
+  if (bar) bar.classList.toggle('warn', warn);
+  if (sec) sec.textContent = Math.ceil(left / 1000);
+  if (clock) clock.classList.toggle('warn', warn);
+  const ring = $('tring'); if (ring) ring.setAttribute('stroke-dashoffset', (100 - 100 * left / TURN_MS).toFixed(2));
+}
+let lastTick = null;
+setInterval(() => {
+  const now = Date.now();
+  const running = state.phase === 'play' && state.answered === null && !$('resetSheet');
+  if (running && lastTick !== null) {
+    state.timeLeft -= now - lastTick;
+    updateTimer();
+    if (state.timeLeft <= 0) { state.timeLeft = 0; answer('timeout'); }
+  }
+  lastTick = running ? now : null;
+}, 100);
+
 function next() {
   const wrap = $('wrap');
   const go = () => {
-    state.i += 1; state.answered = null; state.bet = false;
+    state.i += 1; state.answered = null; state.bet = false; state.timeLeft = TURN_MS;
     if (state.i >= state.order.length) { state.phase = 'end'; renderEnd(); return; }
     renderCard();
     if (reduce) return;
@@ -1447,6 +1491,7 @@ async function shuffleAndDeal() {
     await deal(stack);
   }
   state.phase = 'play';
+  state.timeLeft = TURN_MS;
   renderCard();
   if (!reduce) $('wrap').animate([{ transform: 'perspective(1400px) rotateY(-90deg)' }, { transform: 'perspective(1400px) rotateY(0)' }], { duration: 200, easing: 'ease-out' });
 }
